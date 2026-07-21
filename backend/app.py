@@ -265,13 +265,15 @@ async def verify_ping(request: Request):
 
 
 async def _run_verify(request: Request, host: str, engine: str, base: str,
-                      mx: int, conc: int, delay: float):
+                      mx: int, conc: int, delay: float, category: str = ""):
     queue: asyncio.Queue = asyncio.Queue()
 
     async def emit(ev: dict):
         await queue.put(ev)
 
     dorks = list(DORKS.iter_dorks())
+    if category and category not in ("", "all", "todas"):
+        dorks = [(c, d) for (c, d) in dorks if c == category]
 
     async def worker():
         try:
@@ -316,8 +318,9 @@ async def verify_stream(request: Request):
         delay = max(0.0, float(q.get("delay", "1.0")))
     except ValueError:
         delay = 1.0
+    category = q.get("category", "")
     return StreamingResponse(
-        _run_verify(request, host, engine, base, mx, conc, delay),
+        _run_verify(request, host, engine, base, mx, conc, delay, category),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

@@ -215,7 +215,10 @@
         <h3>Todos los dorks</h3>
         <span class="chip" id="cat_host">—</span>
         <span class="grow"></span>
-        <button id="verifyBtn" class="btn go-verify" style="padding:6px 12px;font-size:12px" disabled>✓ verificar hallazgos</button>
+        <select id="vcat" title="qué categoría verificar" style="max-width:180px;padding:5px 8px;font-size:11px">
+          <option value="all">todas las categorías</option>
+        </select>
+        <button id="verifyBtn" class="btn go-verify" style="padding:6px 12px;font-size:12px" disabled>✓ verificar</button>
       </div>
       <div class="colbody" id="catalog">
         <div class="cat-empty">Selecciona un endpoint en la izquierda para ver su catálogo de dorks.</div>
@@ -256,6 +259,9 @@ async function init(){
   try{
     const [d,c]=await Promise.all([fetch('/api/dorks').then(r=>r.json()),fetch('/api/config').then(r=>r.json())]);
     DORKS=d; $('f_dorks').textContent=d.total; $('f_cats').textContent=d.categories.length; $('st_dorks').textContent=d.total;
+    // poblar el selector de categorías a verificar
+    const vc=$('vcat');
+    d.categories.forEach(c=>{const o=document.createElement('option');o.value=c.category;o.textContent=`${c.category} (${c.dorks.length})`;vc.appendChild(o);});
     const mark=(id,ok)=>{const el=$(id);if(el&&!ok){el.classList.remove('on');el.classList.add('off');
       const i=el.querySelector('input');i.checked=false;i.disabled=true;el.title='no instalado';
       const t=el.querySelector('.tag'); if(t)t.textContent='no instalado'; else el.insertAdjacentHTML('beforeend',' <span class="tag">no instalado</span>');}};
@@ -434,9 +440,10 @@ function verifyHost(host){
   // reinicia hallazgos de este host
   rec.hits=[]; rec.verified=false; rec.errored=false; renderFindings(host);
   rec.verifying=true; updateVerifyBtn(host);
-  const p=new URLSearchParams({host,engine,searxng:base,max:$('vmax').value,concurrency:$('vconc').value,delay:$('vdelay').value});
+  const cat=$('vcat').value;
+  const p=new URLSearchParams({host,engine,searxng:base,max:$('vmax').value,concurrency:$('vconc').value,delay:$('vdelay').value,category:cat});
   $('vprog').textContent='iniciando…';
-  log('info',`verificando ${host} con ${engine} (máx ${$('vmax').value}, delay ${$('vdelay').value}s)`);
+  log('info',`verificando ${host} con ${engine} · categoría: ${cat} (máx ${$('vmax').value}, delay ${$('vdelay').value}s)`);
   ves=new EventSource('/api/verify/stream?'+p.toString());
   ves.onmessage=(m)=>handleVerify(JSON.parse(m.data));
   ves.onerror=()=>{log('warn','verificación: conexión cerrada');finishVerify(host);};
@@ -445,6 +452,14 @@ function handleVerify(ev){
   const rec=endpoints.get(ev.host);
   switch(ev.type){
     case 'verify_start':$('vprog').textContent=`0/${ev.total}`;log('info',`${ev.engine||'motor'}: ${ev.total} dorks a verificar en ${ev.host}`);break;
+    case 'verify_baseline':
+      if(ev.host===selected){
+        $('vprog').innerHTML = ev.count>0
+          ? `prueba base <code>site:${esc(ev.host)}</code> → <b style="color:var(--accent)">${ev.count}</b> resultados · verificando dorks…`
+          : `<span style="color:var(--warn)">prueba base <code>site:${esc(ev.host)}</code> → 0 · el motor no devuelve resultados (revisa SearXNG en http://localhost:8888)</span>`;
+      }
+      log(ev.count>0?'ok':'warn',`prueba base site:${ev.host} → ${ev.count} resultados`+(ev.count>0?' (SearXNG OK)':' (motor sin resultados)'));
+      break;
     case 'verify_progress':if(ev.host===selected)$('vprog').textContent=`${ev.done} · ${ev.hits} hallazgos`;break;
     case 'dork_hit':
       if(rec){rec.hits.push(ev);

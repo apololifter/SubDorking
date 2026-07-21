@@ -127,6 +127,23 @@ async def verify_host(
 
     async with httpx.AsyncClient(timeout=25, headers=_UA, follow_redirects=True) as client:
 
+        # Prueba base: 'site:host' debería devolver resultados si el motor funciona
+        # y el host está indexado. Si da 0, el problema es el motor, no los dorks.
+        try:
+            base_hits = await search(client, base, f"site:{host}")
+            await on_event({"type": "verify_baseline", "host": host,
+                            "query": f"site:{host}", "count": len(base_hits),
+                            "top": base_hits[0] if base_hits else None})
+        except Exception as exc:  # noqa: BLE001
+            errored = True
+            msg = f"{type(exc).__name__}: {exc}"
+            if isinstance(exc, httpx.ConnectError):
+                msg = f"no se pudo conectar a {base or 'el motor'} (¿está corriendo?)"
+            await on_event({"type": "verify_error", "host": host, "message": msg})
+            await on_event({"type": "verify_done", "host": host, "checked": 0,
+                            "hits": 0, "errored": True})
+            return
+
         async def one(category: str, dork: str):
             nonlocal checked, hits, stop, errored
             if stop:
