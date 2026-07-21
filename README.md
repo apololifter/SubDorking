@@ -97,12 +97,19 @@ Cada subdominio agregado obtiene su catálogo completo de dorks y puede verifica
 ## Verificación de hallazgos (gratis)
 
 La tabla de **hallazgos** se llena solo con los dorks que devuelven resultados.
-Hay dos motores (selector en la barra de verificación):
+Hay tres motores (selector en la barra de verificación):
 
-- **DuckDuckGo** (por defecto): funciona **sin instalar nada ni claves**. Ideal para
-  empezar. Puede limitarte si disparas mucho volumen, así que usa el `delay`.
+- **Bing** (por defecto): funciona **sin instalar nada ni claves** y **tolera el
+  scraping mucho mejor** que DuckDuckGo. Es la mejor opción sin setup.
+- **DuckDuckGo**: sin instalar nada, pero **bloquea muy rápido** el scraping
+  automatizado (aunque subas el delay). Úsalo solo como alternativa puntual.
 - **SearXNG**: tu instancia self-hosted ([searxng](https://github.com/searxng/searxng)),
-  sin límites de pago. Requiere levantar el contenedor:
+  lo más robusto para verificar mucho volumen. Requiere levantar el contenedor:
+
+> **Importante:** *todos* los buscadores limitan el scraping. Verificar cientos de
+> dorks seguidos hará que cualquiera te bloquee temporalmente. Para uso sin setup,
+> verifica **pocas consultas** (30–50) con **delay 2s+ y concurrencia 1** por
+> endpoint. Para volumen alto, monta SearXNG (rota motores y aguanta más).
 
 1. Levanta SearXNG con Docker:
    ```bash

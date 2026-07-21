@@ -135,7 +135,7 @@
 <body>
 <header>
   <h1>Sub<span>Dork</span></h1>
-  <span class="sub">enumeración recursiva → catálogo de dorks + verificación con SearXNG</span>
+  <span class="sub">enumeración recursiva → catálogo de dorks + verificación de hallazgos</span>
 </header>
 
 <main>
@@ -159,14 +159,15 @@
     </div>
 
     <div class="verifybar">
-      <p class="full">Verificación de hallazgos (opcional): <b>DuckDuckGo</b> funciona sin instalar nada;
-        <b>SearXNG</b> requiere tu instancia local. Solo se listan los dorks que devuelven resultados.</p>
+      <p class="full">Verificación de hallazgos (opcional): <b>Bing</b> funciona sin instalar nada (tolera mejor el
+        scraping); <b>DuckDuckGo</b> bloquea rápido; <b>SearXNG</b> (tu instancia) es lo más robusto.
+        Todos los buscadores limitan el volumen: usa pocas consultas y delay alto, o SearXNG para verificar mucho.</p>
       <div><label>Motor</label>
-        <select id="vengine"><option value="duckduckgo">DuckDuckGo</option><option value="searxng">SearXNG</option></select></div>
+        <select id="vengine"><option value="bing">Bing</option><option value="duckduckgo">DuckDuckGo</option><option value="searxng">SearXNG</option></select></div>
       <div><label>URL de SearXNG</label><input id="searxng" type="url" placeholder="http://localhost:8888" disabled /></div>
-      <div><label>Máx.</label><input id="vmax" type="number" min="1" value="150" /></div>
-      <div><label>Concurr.</label><input id="vconc" type="number" min="1" max="8" value="2" /></div>
-      <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="1.5" /></div>
+      <div><label>Máx.</label><input id="vmax" type="number" min="1" value="40" /></div>
+      <div><label>Concurr.</label><input id="vconc" type="number" min="1" max="8" value="1" /></div>
+      <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="2" /></div>
       <div><button id="ping" class="btn btn-ping">probar</button></div>
       <div class="full"><span id="pingmsg"></span></div>
     </div>
@@ -233,7 +234,7 @@
   </div>
 </main>
 
-<footer>SubDork · <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías · verificación gratis vía SearXNG · uso autorizado</footer>
+<footer>SubDork · <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías · verificación vía Bing / SearXNG · uso autorizado</footer>
 
 <script>
 const $=(id)=>document.getElementById(id);
@@ -423,14 +424,14 @@ function verifyHost(host){
 function handleVerify(ev){
   const rec=endpoints.get(ev.host);
   switch(ev.type){
-    case 'verify_start':$('vprog').textContent=`0/${ev.total}`;log('info',`SearXNG: ${ev.total} dorks a verificar en ${ev.host}`);break;
+    case 'verify_start':$('vprog').textContent=`0/${ev.total}`;log('info',`${ev.engine||'motor'}: ${ev.total} dorks a verificar en ${ev.host}`);break;
     case 'verify_progress':if(ev.host===selected)$('vprog').textContent=`${ev.done} · ${ev.hits} hallazgos`;break;
     case 'dork_hit':
       if(rec){rec.hits.push(ev);
         const b=rec.item.querySelector('.badge');b.textContent=rec.hits.length;b.classList.add('has');}
       if(ev.host===selected){ if(!$('hitbody')) renderFindings(ev.host); else appendFindingRow(ev,true); }
       log('ok',`  ! hallazgo [${ev.category}] ${ev.host}`);break;
-    case 'verify_error':log('err','SearXNG: '+ev.message);
+    case 'verify_error':log('err','verificación: '+ev.message);
       $('pingmsg').innerHTML='<span style="color:var(--err)">'+esc(ev.message)+'</span>';break;
     case 'verify_done':
       if(ev.errored){$('vprog').innerHTML='<span style="color:var(--err)">verificación detenida por error</span>';}

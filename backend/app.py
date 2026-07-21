@@ -164,7 +164,7 @@ async def scan_stream(request: Request):
 @app.get("/api/verify/ping")
 async def verify_ping(request: Request):
     q = request.query_params
-    engine = q.get("engine", "duckduckgo")
+    engine = q.get("engine", "bing")
     base = q.get("searxng", "")
     return JSONResponse(await searxng_ping(engine, base))
 
@@ -203,7 +203,7 @@ async def _run_verify(request: Request, host: str, engine: str, base: str,
 async def verify_stream(request: Request):
     q = request.query_params
     host = (q.get("host") or "").strip().lower()
-    engine = q.get("engine", "duckduckgo")
+    engine = q.get("engine", "bing")
     base = (q.get("searxng") or "").strip()
     if not host or "." not in host:
         return JSONResponse({"error": "host inválido"}, status_code=400)

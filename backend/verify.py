@@ -26,6 +26,7 @@ _UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 F
        "Accept": "text/html,application/xhtml+xml"}
 
 _DDG_RE = re.compile(r'class="result__a"[^>]*href="([^"]+)"')
+_BING_RE = re.compile(r'<li class="b_algo".*?<h2>\s*<a[^>]*href="(https?://[^"]+)"', re.S)
 
 
 def _decode_ddg(href: str) -> str:
@@ -46,6 +47,19 @@ async def _search_duckduckgo(client: httpx.AsyncClient, base: str, query: str) -
     return [_decode_ddg(h) for h in _DDG_RE.findall(html)]
 
 
+async def _search_bing(client: httpx.AsyncClient, base: str, query: str) -> list[str]:
+    r = await client.get("https://www.bing.com/search",
+                         params={"q": query, "count": 10, "setlang": "en"})
+    r.raise_for_status()
+    html = r.text
+    links = _BING_RE.findall(html)
+    if not links and "b_algo" not in html:
+        low = html.lower()
+        if "captcha" in low or "verify you are a human" in low or "unusual traffic" in low:
+            raise RuntimeError("Bing pidió CAPTCHA (rate limit); sube el delay o usa SearXNG")
+    return links
+
+
 async def _search_searxng(client: httpx.AsyncClient, base: str, query: str) -> list[str]:
     r = await client.get(f"{base}/search", params={"q": query, "format": "json"})
     r.raise_for_status()
@@ -53,12 +67,12 @@ async def _search_searxng(client: httpx.AsyncClient, base: str, query: str) -> l
     return [(x or {}).get("url") for x in (data.get("results") or [])]
 
 
-_ENGINES = {"duckduckgo": _search_duckduckgo, "searxng": _search_searxng}
+_ENGINES = {"bing": _search_bing, "duckduckgo": _search_duckduckgo, "searxng": _search_searxng}
 
 
 async def ping(engine: str, base_url: str = "", timeout: int = 12) -> dict:
     """Comprueba que el motor de verificación responde."""
-    engine = engine or "duckduckgo"
+    engine = engine or "bing"
     if engine not in _ENGINES:
         return {"ok": False, "error": f"motor desconocido: {engine}"}
     if engine == "searxng" and not (base_url or "").strip():
@@ -85,7 +99,7 @@ async def verify_host(
     host: str,
     dorks: list[tuple[str, str]],
     on_event: EventCB,
-    engine: str = "duckduckgo",
+    engine: str = "bing",
     base_url: str = "",
     is_disconnected: Callable[[], Awaitable[bool]] | None = None,
     max_queries: int = 150,
@@ -93,7 +107,7 @@ async def verify_host(
     delay: float = 1.0,
 ):
     """Verifica los dorks de un host, transmitiendo hallazgos en vivo."""
-    engine = engine or "duckduckgo"
+    engine = engine or "bing"
     search = _ENGINES.get(engine)
     if search is None:
         await on_event({"type": "verify_error", "host": host, "message": f"motor desconocido: {engine}"})
