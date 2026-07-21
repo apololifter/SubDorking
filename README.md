@@ -1,11 +1,10 @@
 # SubDork
 
 Herramienta local de reconocimiento: enumera subdominios de forma **recursiva**
-con `subfinder` y `amass`, los va mostrando **uno a uno en una interfaz web
-colapsable mientras cargan**, y dentro de cada subdominio genera **Google dorks**
-(1882 dorks en 257 categorías) listos para lanzar con un clic. Opcionalmente
-verifica cada dork contra una API de búsqueda y muestra **solo los que tienen
-hallazgos**.
+lanzando varias fuentes (`crt.sh`, `subfinder`, `amass`) **en paralelo**, los va
+mostrando **uno a uno en una interfaz web colapsable mientras cargan** (streaming
+SSE), y dentro de cada subdominio arma el **catálogo completo de Google dorks**
+(1882 dorks en 257 categorías) como enlaces clicables para ejecutar **a mano**.
 
 > ⚠ **Uso autorizado únicamente.** Ejecútalo solo sobre dominios que te
 > pertenezcan o para los que tengas permiso explícito (bug bounty en alcance,
@@ -16,29 +15,33 @@ hallazgos**.
 ## Cómo funciona
 
 ```
-dominio  ──subfinder+amass──►  subdominios (nivel 1)
+dominio  ──[crt.sh ‖ subfinder ‖ amass]──►  subdominios (nivel 1)   (fuentes en PARALELO)
                                   │  reinyecta cada uno
                                   ▼
                               sub-subdominios (nivel 2) ... hasta la profundidad elegida
                                   │
                                   ▼
-   cada subdominio  ──►  panel colapsable  ──►  1290 dorks clicables por categoría
-                                                (o solo los verificados con hallazgos)
+   cada subdominio  ──►  panel colapsable  ──►  1882 dorks clicables por categoría (manual)
 ```
 
+- **Tres fuentes combinables:** `crt.sh` (Certificate Transparency, integrada, sin
+  instalar nada ni claves — la más fiable para empezar), `subfinder` y `amass`.
+- **Consola de actividad en vivo:** muestra qué fuente está consultando, cuántos
+  resultados devuelve cada una y cualquier error, para que nunca te quedes sin saber
+  qué está pasando.
 - **Streaming en vivo (SSE):** cada subdominio aparece en la interfaz apenas se
   descubre, sin esperar a que termine todo.
 - **Profundidad configurable (1–4):** cuántos niveles de recursión.
-- **Dorks con un clic:** cada dork es un enlace `site:<subdominio> <dork>` que
-  abre Google en una pestaña nueva. Si un dork ya trae su propio `site:`
-  (p. ej. dorks de descubrimiento de programas bug bounty), se respeta tal cual.
-- **Modo híbrido de verificación:** sin API key ves todos los dorks como enlaces;
-  con API key solo aparecen los que devuelven resultados.
+- **Fuentes en paralelo:** todas las fuentes activas se lanzan a la vez sobre cada
+  objetivo; los resultados se entremezclan y aparecen en cuanto llegan.
+- **Dorks manuales, con un clic:** cada dork es un enlace `site:<subdominio> <dork>`
+  que abre Google en una pestaña nueva. Sin APIs ni claves: tú decides qué ejecutar.
+  Si un dork ya trae su propio `site:`, se respeta tal cual.
 
 ## Requisitos
 
-1. **Python 3.9+**
-2. **subfinder** y **amass** (opcionales pero recomendados; sin ellos usa el *modo demo*):
+1. **Python 3.9+**  *(única dependencia obligatoria — con `crt.sh` ya enumera sin nada más)*
+2. **subfinder** y **amass** (opcionales, amplían la cobertura):
    - subfinder: https://github.com/projectdiscovery/subfinder → `go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest`
    - amass: https://github.com/owasp-amass/amass → `go install github.com/owasp-amass/amass/v4/...@master`
    - En Windows también hay binarios `.exe` en la sección *Releases* de cada repo.
@@ -65,25 +68,15 @@ python -m uvicorn app:app --app-dir backend --host 127.0.0.1 --port 8000
 ## Uso
 
 1. Escribe el dominio (ej. `ejemplo.com`) y elige la profundidad.
-2. Marca `subfinder` / `amass`. Si no los tienes instalados, activa **modo demo**
-   para ver la interfaz funcionando con datos ficticios.
-3. **Escanear.** Los subdominios van apareciendo como paneles colapsables.
-4. Abre un panel para ver los dorks agrupados por categoría; usa el buscador
-   interno para filtrar. Clic en un dork → se abre la búsqueda en Google.
-
-### Verificación por API (opcional)
-
-Despliega *"Verificación por API"* y elige proveedor:
-
-- **Google CSE** (Custom Search JSON API): necesita `API key` + `cx`
-  (ID del motor). 100 consultas/día gratis. Alta en
-  https://developers.google.com/custom-search/v1/overview
-- **SerpAPI**: necesita solo `API key`. https://serpapi.com
-
-Con verificación activa, SubDork consulta cada dork y **solo lista los que
-devuelven resultados**, con el conteo aproximado y el primer enlace. Como son
-1290 dorks por subdominio, ajusta **Máx. consultas** para no agotar tu cuota
-(el tope por defecto es 300 consultas por escaneo).
+2. Elige las **fuentes**: `crt.sh` (recomendada, siempre disponible), `subfinder`
+   y/o `amass` (marcada "lento"). Si no tienes ninguna instalada, `crt.sh` ya basta;
+   o activa **modo demo** para ver la interfaz con datos ficticios.
+3. **Escanear.** Las fuentes corren en paralelo y los subdominios aparecen como
+   paneles colapsables en cuanto se descubren. La **consola de actividad** muestra
+   qué está pasando (fuente, conteos, errores).
+4. Abre un panel para ver el catálogo completo de dorks agrupado por categoría; usa
+   el buscador interno para filtrar. Clic en un dork → se abre la búsqueda en Google.
+   La ejecución es 100% manual: tú eliges qué dorks lanzar.
 
 ## Subir a GitHub
 
@@ -116,9 +109,8 @@ hacer `push`.
 subdork/
 ├─ backend/
 │  ├─ app.py      API FastAPI + streaming SSE
-│  ├─ recon.py    subfinder/amass recursivo
-│  ├─ dorks.py    carga de dorks y armado de URLs
-│  └─ verify.py   verificación opcional por API
+│  ├─ recon.py    crt.sh + subfinder + amass en paralelo (recursivo)
+│  └─ dorks.py    carga de dorks y armado de URLs
 ├─ data/dorks.json   1882 dorks / 257 categorías (multi-fuente)
 ├─ _sources/         listas crudas + merge.py (regenera dorks.json)
 ├─ frontend/index.html   interfaz colapsable
@@ -129,9 +121,11 @@ subdork/
 
 ## Notas
 
-- No se hace scraping directo de google.com/search (lo bloquea con CAPTCHA y
-  viola sus términos): la verificación usa APIs oficiales.
-- `amass` corre en modo `-passive` para un reconocimiento silencioso.
+- Los dorks se ejecutan manualmente (clic → Google). No hay scraping ni APIs de
+  búsqueda: es más simple, gratis y sin límites de cuota.
+- `crt.sh` es la fuente por defecto: no requiere instalación ni claves.
+- `amass` corre en modo `-passive` para un reconocimiento silencioso (pero es lento;
+  por eso viene desactivado por defecto).
 - La base de dorks combina varias fuentes públicas (ver abajo). Al integrarlas
   se aplicó un **filtro de calidad**: solo se conservan líneas con operadores de
   búsqueda reales (`site:`, `inurl:`, `intitle:`, `intext:`, `filetype:`, `ext:`,

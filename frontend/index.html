@@ -5,442 +5,385 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SubDork · recon de subdominios + google dorks</title>
 <style>
-  :root {
-    --bg: #0b0f14; --panel: #121821; --panel2: #0e141c; --border: #1e2a38;
-    --txt: #d7e0ea; --muted: #7c8794; --accent: #35d29a;
-    --accent2: #4aa8ff; --warn: #f2b545; --hit: #ff6a8b; --chip: #1b2836;
+  :root{
+    --bg:#0b0f14; --panel:#121821; --panel2:#0e141c; --border:#1e2a38;
+    --txt:#dbe4ee; --muted:#8394a5; --accent:#35d29a; --accent2:#4aa8ff;
+    --warn:#f2b545; --err:#ff6a8b; --chip:#1b2836; --ok:#35d29a;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--txt);
-    font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  }
-  a { color: var(--accent2); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  header {
-    padding: 18px 22px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-  }
-  header h1 { margin: 0; font-size: 20px; letter-spacing: .5px; }
-  header h1 span { color: var(--accent); }
-  header .sub { color: var(--muted); font-size: 12px; }
-  main { max-width: 1080px; margin: 0 auto; padding: 20px 22px 80px; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:14px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{padding:16px 22px;border-bottom:1px solid var(--border);
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:20px;letter-spacing:.5px}
+  header h1 span{color:var(--accent)}
+  header .sub{color:var(--muted);font-size:12px}
+  main{max-width:1120px;margin:0 auto;padding:20px 22px 90px}
 
-  .controls {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
-    padding: 16px; display: grid; gap: 14px;
-    grid-template-columns: 2fr 1fr 1fr; align-items: end;
-  }
-  .controls .full { grid-column: 1 / -1; }
-  label { display: block; font-size: 11px; text-transform: uppercase;
-          letter-spacing: .6px; color: var(--muted); margin-bottom: 5px; }
-  input[type=text], input[type=number], select {
-    width: 100%; background: var(--panel2); border: 1px solid var(--border);
-    color: var(--txt); border-radius: 7px; padding: 9px 11px; font: inherit;
-  }
-  input:focus, select:focus { outline: none; border-color: var(--accent2); }
-  .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-  .checkbox { display: flex; align-items: center; gap: 7px; font-size: 13px;
-              color: var(--txt); text-transform: none; letter-spacing: 0; }
-  .checkbox input { width: auto; }
-  button.go {
-    background: var(--accent); color: #062018; border: none; font: inherit;
-    font-weight: 700; padding: 10px 20px; border-radius: 7px; cursor: pointer;
-  }
-  button.go:disabled { opacity: .5; cursor: not-allowed; }
-  button.stop { background: var(--hit); color: #2a0810; }
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
 
-  .adv { border-top: 1px dashed var(--border); padding-top: 12px; }
-  .adv summary { cursor: pointer; color: var(--muted); font-size: 12px;
-                 text-transform: uppercase; letter-spacing: .6px; }
-  .adv .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
-               margin-top: 12px; }
+  /* ---- formulario ---- */
+  .form-top{display:grid;grid-template-columns:1fr 130px 150px;gap:14px;align-items:end}
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--muted);margin-bottom:6px}
+  input[type=text],input[type=number],select{width:100%;background:var(--panel2);
+    border:1px solid var(--border);color:var(--txt);border-radius:8px;padding:11px 12px;font:inherit}
+  input[type=text]#domain{font-size:16px}
+  input:focus,select:focus{outline:none;border-color:var(--accent2)}
+  .btn{border:none;font:inherit;font-weight:700;padding:12px 18px;border-radius:8px;cursor:pointer;white-space:nowrap}
+  .btn-go{background:var(--accent);color:#062018;width:100%}
+  .btn-go.scanning{background:var(--err);color:#2a0810}
+  .btn-go:disabled{opacity:.5;cursor:not-allowed}
 
-  .statusbar { display: flex; gap: 18px; flex-wrap: wrap; margin: 18px 0 8px;
-               font-size: 12px; color: var(--muted); }
-  .statusbar b { color: var(--txt); }
-  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-         background: var(--muted); margin-right: 6px; }
-  .dot.live { background: var(--accent); animation: pulse 1s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .sources{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center}
+  .sources .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-right:4px}
+  .src{display:flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--border);
+    border-radius:20px;background:var(--panel2);cursor:pointer;user-select:none;font-size:13px}
+  .src.on{border-color:var(--accent);color:var(--txt)}
+  .src.off{opacity:.6}
+  .src .tag{font-size:10px;color:var(--muted)}
+  .src input{accent-color:var(--accent)}
 
-  .note { font-size: 12px; color: var(--muted); background: var(--panel2);
-          border: 1px solid var(--border); border-left: 3px solid var(--warn);
-          padding: 10px 12px; border-radius: 7px; margin: 12px 0; }
+  details.adv{margin-top:16px;border-top:1px dashed var(--border);padding-top:14px}
+  details.adv summary{cursor:pointer;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+  details.adv .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
 
-  /* Paneles colapsables de subdominios */
-  .host {
-    border: 1px solid var(--border); border-radius: 9px; margin-top: 10px;
-    background: var(--panel); overflow: hidden;
-    animation: slidein .25s ease;
-  }
-  @keyframes slidein { from{opacity:0; transform: translateY(-4px)} to{opacity:1} }
-  .host > .hd {
-    display: flex; align-items: center; gap: 10px; padding: 11px 14px;
-    cursor: pointer; user-select: none;
-  }
-  .host > .hd:hover { background: #16202c; }
-  .caret { transition: transform .15s; color: var(--muted); }
-  .host.open .caret { transform: rotate(90deg); }
-  .host .name { font-weight: 600; color: var(--txt); }
-  .host .name .tld { color: var(--muted); }
-  .chip { font-size: 11px; padding: 2px 8px; border-radius: 20px;
-          background: var(--chip); color: var(--muted); border: 1px solid var(--border); }
-  .chip.lvl { color: var(--accent2); }
-  .chip.hits { color: var(--hit); border-color: #3a2530; }
-  .chip.count { color: var(--accent); }
-  .grow { flex: 1; }
-  .host .body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
-  .host.open .body { display: block; }
+  .note{font-size:12.5px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);
+    border-left:3px solid var(--warn);padding:11px 13px;border-radius:8px;margin:14px 0}
 
-  .host-tools { display: flex; gap: 10px; align-items: center; margin: 12px 0 8px;
-                flex-wrap: wrap; }
-  .host-tools input[type=text] { max-width: 260px; padding: 6px 9px; }
-  .catbtn { font-size: 12px; }
+  /* ---- barra de estado ---- */
+  .status{display:none;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 6px;font-size:13px}
+  .status.show{display:flex}
+  .pill{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:7px 12px}
+  .pill b{color:var(--txt)}
+  .pill .k{color:var(--muted)}
+  .spinner{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);
+    border-top-color:var(--accent);display:inline-block;vertical-align:-2px;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .state-txt{font-weight:700}
 
-  .cat { border: 1px solid var(--border); border-radius: 7px; margin: 8px 0;
-         background: var(--panel2); }
-  .cat > .ch { padding: 8px 11px; cursor: pointer; display: flex; gap: 8px;
-               align-items: center; user-select: none; }
-  .cat > .ch:hover { background: #131b25; }
-  .cat .cname { color: var(--accent); font-size: 13px; }
-  .cat .cbody { display: none; padding: 4px 11px 10px; }
-  .cat.open .cbody { display: block; }
-  .dork { display: block; padding: 5px 8px; border-radius: 5px;
-          border: 1px solid transparent; margin: 3px 0; word-break: break-all; }
-  .dork:hover { background: #16202c; border-color: var(--border); text-decoration: none; }
-  .dork .q { color: var(--txt); }
-  .dork .op { color: var(--warn); }
-  .dork.hit { border-color: #3a2530; background: #1a1015; }
-  .dork .meta { color: var(--muted); font-size: 11px; margin-left: 6px; }
+  /* ---- consola de actividad ---- */
+  .console{margin:12px 0;border:1px solid var(--border);border-radius:10px;background:#080c11;overflow:hidden}
+  .console summary{cursor:pointer;padding:9px 14px;color:var(--muted);font-size:12px;
+    text-transform:uppercase;letter-spacing:.6px;list-style:none;display:flex;align-items:center;gap:8px}
+  .console summary::-webkit-details-marker{display:none}
+  .console .log{max-height:200px;overflow:auto;padding:8px 14px;font-size:12px;line-height:1.7;
+    border-top:1px solid var(--border)}
+  .log .ln{white-space:pre-wrap;word-break:break-all}
+  .log .t{color:#4a5a6a}
+  .log .i-info{color:var(--muted)}
+  .log .i-ok{color:var(--ok)}
+  .log .i-sub{color:var(--accent2)}
+  .log .i-warn{color:var(--warn)}
+  .log .i-err{color:var(--err)}
 
-  .empty { color: var(--muted); padding: 30px; text-align: center; }
-  footer { color: var(--muted); font-size: 11px; text-align: center; padding: 20px; }
-  code { background: var(--panel2); padding: 1px 5px; border-radius: 4px; color: var(--accent); }
+  /* ---- resultados ---- */
+  .results-head{display:flex;align-items:center;gap:10px;margin:20px 0 6px}
+  .results-head h2{font-size:15px;margin:0}
+  .allfilter{margin-left:auto;max-width:280px;width:100%}
+  .allfilter input{padding:8px 11px}
+
+  .empty{color:var(--muted);padding:44px 20px;text-align:center;border:1px dashed var(--border);
+    border-radius:12px;background:var(--panel2)}
+  .empty b{color:var(--txt)}
+
+  .host{border:1px solid var(--border);border-radius:10px;margin-top:10px;background:var(--panel);
+    overflow:hidden;animation:slide .25s ease}
+  @keyframes slide{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+  .host>.hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
+  .host>.hd:hover{background:#16202c}
+  .caret{transition:transform .15s;color:var(--muted);font-size:11px}
+  .host.open .caret{transform:rotate(90deg)}
+  .host .name{font-weight:600}
+  .host .name .tld{color:var(--muted)}
+  .chip{font-size:11px;padding:2px 9px;border-radius:20px;background:var(--chip);
+    color:var(--muted);border:1px solid var(--border)}
+  .chip.lvl{color:var(--accent2)}
+  .chip.src{color:var(--muted)}
+  .chip.hits{color:var(--err);border-color:#3a2530}
+  .chip.count{color:var(--accent)}
+  .grow{flex:1}
+  .host .body{display:none;padding:2px 14px 14px;border-top:1px solid var(--border)}
+  .host.open .body{display:block}
+
+  .host-tools{display:flex;gap:10px;align-items:center;margin:12px 0 8px;flex-wrap:wrap}
+  .host-tools input[type=text]{max-width:260px;padding:6px 10px}
+  .mini{font-size:12px;padding:6px 12px;border-radius:7px;background:var(--panel2);
+    border:1px solid var(--border);color:var(--txt);cursor:pointer}
+  .mini:hover{border-color:var(--accent2)}
+
+  .cat{border:1px solid var(--border);border-radius:8px;margin:8px 0;background:var(--panel2)}
+  .cat>.ch{padding:9px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;user-select:none}
+  .cat>.ch:hover{background:#131b25}
+  .cat .cname{color:var(--accent);font-size:13px}
+  .cat .cbody{display:none;padding:4px 12px 10px}
+  .cat.open .cbody{display:block}
+  .dork{display:block;padding:6px 9px;border-radius:6px;border:1px solid transparent;margin:3px 0;word-break:break-all}
+  .dork:hover{background:#16202c;border-color:var(--border);text-decoration:none}
+  .dork .q{color:var(--txt)}
+  .dork .op{color:var(--warn)}
+  .dork.hit{border-color:#3a2530;background:#1a1015}
+  .dork .meta{color:var(--muted);font-size:11px;margin-left:6px}
+
+  footer{color:var(--muted);font-size:11px;text-align:center;padding:22px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--accent)}
 </style>
 </head>
 <body>
 <header>
   <h1>Sub<span>Dork</span></h1>
-  <span class="sub">enumeración recursiva de subdominios &rarr; google dorks en vivo</span>
+  <span class="sub">enumeración recursiva de subdominios → google dorks en vivo</span>
 </header>
 
 <main>
-  <div class="controls">
-    <div>
-      <label>Dominio objetivo</label>
-      <input id="domain" type="text" placeholder="ejemplo.com" autocomplete="off" />
-    </div>
-    <div>
-      <label>Profundidad</label>
-      <input id="depth" type="number" min="1" max="4" value="2" />
-    </div>
-    <div>
-      <label>&nbsp;</label>
-      <button id="go" class="go">▶ Escanear</button>
-    </div>
-
-    <div class="full row">
-      <span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px">Herramientas:</span>
-      <label class="checkbox"><input type="checkbox" id="t_subfinder" checked /> subfinder</label>
-      <label class="checkbox"><input type="checkbox" id="t_amass" checked /> amass</label>
-      <label class="checkbox"><input type="checkbox" id="demo" /> modo demo (sin herramientas)</label>
-    </div>
-
-    <details class="adv full">
-      <summary>Verificación por API (opcional — muestra solo dorks con hallazgos)</summary>
-      <div class="grid">
-        <div>
-          <label>Proveedor</label>
-          <select id="provider">
-            <option value="none">Ninguno (links clicables)</option>
-            <option value="google_cse">Google CSE</option>
-            <option value="serpapi">SerpAPI</option>
-          </select>
-        </div>
-        <div>
-          <label>API key</label>
-          <input id="api_key" type="text" placeholder="tu API key" autocomplete="off" />
-        </div>
-        <div>
-          <label>cx (solo Google CSE)</label>
-          <input id="cx" type="text" placeholder="search engine id" autocomplete="off" />
-        </div>
-        <div>
-          <label>Máx. consultas</label>
-          <input id="max_queries" type="number" min="1" value="300" />
-        </div>
-        <div>
-          <label>Concurrencia</label>
-          <input id="concurrency" type="number" min="1" max="10" value="3" />
-        </div>
-        <div>
-          <label>Delay (s)</label>
-          <input id="delay" type="number" min="0" step="0.5" value="1" />
-        </div>
+  <div class="card">
+    <div class="form-top">
+      <div>
+        <label>Dominio objetivo</label>
+        <input id="domain" type="text" placeholder="ejemplo.com" autocomplete="off" spellcheck="false" />
       </div>
-      <p class="note" style="margin-top:12px">
-        Sin proveedor, cada dork es un enlace: al hacer clic se abre la búsqueda en Google.
-        Con proveedor, se consulta cada dork y solo aparecen los que devuelven resultados
-        (consume cuota de tu API).
-      </p>
-    </details>
+      <div>
+        <label>Profundidad</label>
+        <input id="depth" type="number" min="1" max="4" value="1" />
+      </div>
+      <div>
+        <button id="go" class="btn btn-go">▶ Escanear</button>
+      </div>
+    </div>
+
+    <div class="sources">
+      <span class="lbl">Fuentes</span>
+      <label class="src on" id="s_crtsh"><input type="checkbox" checked /> crt.sh <span class="tag">recomendado</span></label>
+      <label class="src on" id="s_subfinder"><input type="checkbox" checked /> subfinder</label>
+      <label class="src off" id="s_amass"><input type="checkbox" /> amass <span class="tag">lento</span></label>
+      <label class="src off" id="s_demo" style="margin-left:auto"><input type="checkbox" /> modo demo <span class="tag">sin herramientas</span></label>
+    </div>
+
+    <p style="color:var(--muted);font-size:12.5px;margin:16px 0 0">
+      Cada subdominio trae su <b>catálogo completo de dorks</b> como enlaces:
+      ábrelo y haz clic para lanzar la búsqueda en Google. Ejecución 100% manual.
+    </p>
   </div>
 
-  <p class="note" id="scopeNote">
-    ⚠ Usa esto solo en dominios que tengas <b>autorización</b> para evaluar (tus activos,
-    bug bounty en alcance, pentest con permiso). El escaneo pasivo aun así es tu responsabilidad.
-  </p>
+  <p class="note">⚠ Usa esto solo en dominios que tengas <b>autorización</b> para evaluar
+    (tus activos, bug bounty en alcance, pentest con permiso).</p>
 
-  <div class="statusbar" id="status" style="display:none">
-    <span><span class="dot" id="livedot"></span><b id="st_state">—</b></span>
-    <span>subdominios: <b id="st_subs">0</b></span>
-    <span>nivel: <b id="st_level">—</b></span>
-    <span>dorks base: <b id="st_dorks">—</b></span>
-    <span id="st_budgetwrap" style="display:none">cuota API: <b id="st_budget">—</b></span>
+  <!-- barra de estado -->
+  <div class="status" id="status">
+    <span class="state-txt" id="st_state"><span class="spinner"></span> —</span>
+    <span class="pill"><span class="k">subdominios</span> <b id="st_subs">0</b></span>
+    <span class="pill"><span class="k">nivel</span> <b id="st_level">—</b></span>
+    <span class="pill" id="st_srcwrap"><span class="k">fuente activa</span> <b id="st_src">—</b></span>
+    <span class="pill"><span class="k">dorks base</span> <b id="st_dorks">—</b></span>
+  </div>
+
+  <!-- consola de actividad -->
+  <details class="console" id="console">
+    <summary>▸ Consola de actividad <span id="log_count" style="color:var(--muted)"></span></summary>
+    <div class="log" id="log"></div>
+  </details>
+
+  <div class="results-head">
+    <h2 id="rh">Resultados</h2>
+    <div class="allfilter"><input type="text" id="allfilter" placeholder="filtrar subdominios…" style="display:none" /></div>
   </div>
 
   <div id="results">
-    <div class="empty" id="emptyMsg">Ingresa un dominio y presiona <b>Escanear</b>.</div>
+    <div class="empty" id="emptyMsg">Ingresa un dominio y presiona <b>Escanear</b>.
+      <br><span style="font-size:12px">Si no tienes subfinder/amass, <b>crt.sh</b> ya funciona solo. Prueba también <b>modo demo</b>.</span></div>
   </div>
 </main>
 
-<footer>
-  SubDork · base local de <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías ·
-  reconocimiento OSINT para uso autorizado
-</footer>
+<footer>SubDork · base local de <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías · uso autorizado</footer>
 
 <script>
-const $ = (id) => document.getElementById(id);
-let DORKS = { categories: [], total: 0 };
-let es = null;                 // EventSource activo
-const hosts = new Map();       // host -> {el, bodyBuilt, verify, hitsEl, count}
-let verifyMode = false;
+const $=(id)=>document.getElementById(id);
+let DORKS={categories:[],total:0};
+let es=null;
+const verifyMode=false;   // verificación por API eliminada: dorks 100% manuales
+const hosts=new Map();
 
-// ---- construcción de la consulta (espejo de dorks.py) ----
-function buildQuery(host, dork) {
-  return /\bsite:/i.test(dork) ? dork : `site:${host} ${dork}`;
-}
-function googleUrl(host, dork) {
-  return "https://www.google.com/search?q=" + encodeURIComponent(buildQuery(host, dork));
-}
-function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-// resalta operadores tipo intitle: inurl: filetype: etc.
-function fmtDork(q){
-  return esc(q).replace(/\b(site|intitle|inurl|intext|filetype|ext|allintext|allinurl|cache|link|related|info):/g,
-    '<span class="op">$1:</span>');
-}
+/* --- consulta google (espejo de dorks.py) --- */
+const buildQuery=(h,d)=> /\bsite:/i.test(d) ? d : `site:${h} ${d}`;
+const googleUrl=(h,d)=>"https://www.google.com/search?q="+encodeURIComponent(buildQuery(h,d));
+const esc=(s)=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtDork=(q)=>esc(q).replace(/\b(site|intitle|inurl|intext|filetype|ext|allintext|allinurl|allintitle|cache|link|related|inanchor|numrange):/g,'<span class="op">$1:</span>');
 
-// ---- carga inicial ----
+/* --- init --- */
 async function init(){
-  try {
-    const [d, c] = await Promise.all([
-      fetch('/api/dorks').then(r=>r.json()),
-      fetch('/api/config').then(r=>r.json())
-    ]);
-    DORKS = d;
-    $('f_dorks').textContent = d.total;
-    $('f_cats').textContent = d.categories.length;
-    $('st_dorks').textContent = d.total;
-    // marca herramientas no disponibles y sugiere demo
-    if (!c.tools.subfinder){ $('t_subfinder').checked=false; $('t_subfinder').parentElement.style.opacity=.5;
-      $('t_subfinder').parentElement.title='no instalado en el servidor'; }
-    if (!c.tools.amass){ $('t_amass').checked=false; $('t_amass').parentElement.style.opacity=.5;
-      $('t_amass').parentElement.title='no instalado en el servidor'; }
-    if (!c.tools.subfinder && !c.tools.amass){ $('demo').checked=true; }
-  } catch(e){ console.error(e); }
+  try{
+    const [d,c]=await Promise.all([fetch('/api/dorks').then(r=>r.json()),fetch('/api/config').then(r=>r.json())]);
+    DORKS=d; $('f_dorks').textContent=d.total; $('f_cats').textContent=d.categories.length; $('st_dorks').textContent=d.total;
+    const mark=(id,ok)=>{const el=$(id);if(!ok){el.classList.remove('on');el.classList.add('off');
+      el.querySelector('input').checked=false; el.querySelector('input').disabled=true;
+      el.title='no instalado — se omitirá'; el.querySelector('.tag')?.replaceChildren(document.createTextNode('no instalado'));}};
+    mark('s_subfinder',c.tools.subfinder); mark('s_amass',c.tools.amass);
+    if(!c.tools.subfinder&&!c.tools.amass) log('info','subfinder y amass no están instalados — usando crt.sh (fuente integrada).');
+  }catch(e){console.error(e); log('err','no pude cargar la configuración: '+e.message);}
 }
 init();
 
-// ---- estado UI ----
-function setState(txt, live){
-  $('status').style.display='flex';
-  $('st_state').textContent = txt;
-  $('livedot').className = 'dot' + (live ? ' live' : '');
+/* --- sync chip .on/.off al togglear --- */
+document.querySelectorAll('.src').forEach(s=>{
+  const cb=s.querySelector('input');
+  cb.addEventListener('change',()=>{s.classList.toggle('on',cb.checked);s.classList.toggle('off',!cb.checked);});
+});
+
+/* --- consola --- */
+let logN=0;
+function log(kind,msg){
+  logN++; $('log_count').textContent='('+logN+')';
+  const t=new Date().toLocaleTimeString();
+  const div=document.createElement('div'); div.className='ln';
+  div.innerHTML=`<span class="t">${t}</span> <span class="i-${kind}">${esc(msg)}</span>`;
+  const box=$('log'); box.appendChild(div); box.scrollTop=box.scrollHeight;
 }
 
-// ---- crear panel de subdominio ----
-function addHost(host, level){
-  if (hosts.has(host)) return hosts.get(host);
+/* --- estado --- */
+function setState(txt,live){
+  $('status').classList.add('show');
+  $('st_state').innerHTML=(live?'<span class="spinner"></span> ':'')+esc(txt);
+}
+
+/* --- panel de host --- */
+function hostName(h){const i=h.indexOf('.');return `<span>${esc(h.slice(0,i))}</span><span class="tld">${esc(h.slice(i))}</span>`;}
+function addHost(host,level,source){
+  if(hosts.has(host)) return hosts.get(host);
   $('emptyMsg')?.remove();
-  const el = document.createElement('div');
-  el.className = 'host';
-  el.innerHTML = `
-    <div class="hd">
-      <span class="caret">▶</span>
-      <span class="name">${hostName(host)}</span>
-      <span class="chip lvl">nivel ${level}</span>
+  const el=document.createElement('div'); el.className='host';
+  el.innerHTML=`<div class="hd">
+      <span class="caret">▶</span><span class="name">${hostName(host)}</span>
+      <span class="chip lvl">N${level}</span>
+      ${source?`<span class="chip src">${esc(source)}</span>`:''}
       <span class="grow"></span>
-      <span class="chip count host-count">${DORKS.total} dorks</span>
-      ${verifyMode ? '<span class="chip hits host-hits">0 hallazgos</span>' : ''}
-    </div>
+      <span class="chip count">${DORKS.total} dorks</span>
+      ${verifyMode?'<span class="chip hits">0 hallazgos</span>':''}</div>
     <div class="body"></div>`;
-  const rec = { el, bodyBuilt:false, count: DORKS.total, hits:0 };
-  el.querySelector('.hd').addEventListener('click', ()=> toggleHost(host));
+  el.querySelector('.hd').addEventListener('click',()=>toggleHost(host));
   $('results').appendChild(el);
-  hosts.set(host, rec);
+  const rec={el,bodyBuilt:false,hits:0}; hosts.set(host,rec);
+  $('st_subs').textContent=hosts.size;
   return rec;
 }
-function hostName(host){
-  const i = host.indexOf('.');
-  return `<span>${esc(host.slice(0,i))}</span><span class="tld">${esc(host.slice(i))}</span>`;
-}
-
 function toggleHost(host){
-  const rec = hosts.get(host); if(!rec) return;
-  const open = rec.el.classList.toggle('open');
-  if (open && !rec.bodyBuilt && !verifyMode) buildHostBody(host, rec);
+  const rec=hosts.get(host); if(!rec)return;
+  const open=rec.el.classList.toggle('open');
+  if(open&&!rec.bodyBuilt&&!verifyMode) buildBody(host,rec);
 }
-
-// ---- construir cuerpo (modo links, lazy) ----
-function buildHostBody(host, rec){
-  const body = rec.el.querySelector('.body');
-  const tools = document.createElement('div');
-  tools.className = 'host-tools';
-  tools.innerHTML = `
-    <input type="text" placeholder="filtrar categorías/dorks…" />
-    <button class="go catbtn" data-a="expand">expandir todo</button>
-    <button class="go catbtn" data-a="collapse">colapsar todo</button>`;
+function buildBody(host,rec){
+  const body=rec.el.querySelector('.body');
+  const tools=document.createElement('div'); tools.className='host-tools';
+  tools.innerHTML=`<input type="text" placeholder="filtrar dorks…" />
+    <button class="mini" data-a="expand">expandir todo</button>
+    <button class="mini" data-a="collapse">colapsar todo</button>`;
   body.appendChild(tools);
-  const list = document.createElement('div');
-  body.appendChild(list);
-
-  DORKS.categories.forEach(cat => {
-    const c = document.createElement('div');
-    c.className = 'cat';
-    const dorksHtml = cat.dorks.map(dk =>
-      `<a class="dork" target="_blank" rel="noopener" href="${googleUrl(host, dk)}">
-         <span class="q">${fmtDork(buildQuery(host, dk))}</span></a>`).join('');
-    c.innerHTML = `
-      <div class="ch"><span class="caret">▶</span>
-        <span class="cname">${esc(cat.category)}</span>
-        <span class="grow"></span><span class="chip">${cat.dorks.length}</span></div>
-      <div class="cbody">${dorksHtml}</div>`;
-    c.querySelector('.ch').addEventListener('click', ()=> c.classList.toggle('open'));
+  const list=document.createElement('div'); body.appendChild(list);
+  DORKS.categories.forEach(cat=>{
+    const c=document.createElement('div'); c.className='cat';
+    const dh=cat.dorks.map(dk=>`<a class="dork" target="_blank" rel="noopener" href="${googleUrl(host,dk)}"><span class="q">${fmtDork(buildQuery(host,dk))}</span></a>`).join('');
+    c.innerHTML=`<div class="ch"><span class="caret">▶</span><span class="cname">${esc(cat.category)}</span>
+      <span class="grow"></span><span class="chip">${cat.dorks.length}</span></div><div class="cbody">${dh}</div>`;
+    c.querySelector('.ch').addEventListener('click',()=>c.classList.toggle('open'));
     list.appendChild(c);
   });
-
-  const filt = tools.querySelector('input');
-  filt.addEventListener('input', ()=>{
-    const q = filt.value.toLowerCase();
+  const filt=tools.querySelector('input');
+  filt.addEventListener('input',()=>{
+    const q=filt.value.toLowerCase();
     list.querySelectorAll('.cat').forEach(c=>{
-      const name = c.querySelector('.cname').textContent.toLowerCase();
-      let any = false;
-      c.querySelectorAll('.dork').forEach(d=>{
-        const show = !q || d.textContent.toLowerCase().includes(q) || name.includes(q);
-        d.style.display = show ? '' : 'none'; if(show) any = true;
-      });
-      c.style.display = (any || !q) ? '' : 'none';
-      if (q && any) c.classList.add('open');
+      const name=c.querySelector('.cname').textContent.toLowerCase(); let any=false;
+      c.querySelectorAll('.dork').forEach(d=>{const show=!q||d.textContent.toLowerCase().includes(q)||name.includes(q);d.style.display=show?'':'none';if(show)any=true;});
+      c.style.display=(any||!q)?'':'none'; if(q&&any)c.classList.add('open');
     });
   });
-  tools.querySelectorAll('.catbtn').forEach(b=> b.addEventListener('click', ()=>{
-    const open = b.dataset.a==='expand';
-    list.querySelectorAll('.cat').forEach(c=> c.classList.toggle('open', open));
-  }));
-  rec.bodyBuilt = true;
+  tools.querySelectorAll('.mini').forEach(b=>b.addEventListener('click',()=>{
+    const open=b.dataset.a==='expand'; list.querySelectorAll('.cat').forEach(c=>c.classList.toggle('open',open));}));
+  rec.bodyBuilt=true;
 }
 
-// ---- modo verificación: añadir un hallazgo ----
-function addHit(ev){
-  let rec = hosts.get(ev.host) || addHost(ev.host, 0);
-  if (!rec.bodyBuilt){
-    const body = rec.el.querySelector('.body');
-    body.innerHTML = `<div class="host-tools"><b style="color:var(--muted)">Hallazgos verificados:</b></div>
-                      <div class="hitlist"></div>`;
-    rec.hitList = body.querySelector('.hitlist');
-    rec.bodyBuilt = true;
-    rec.el.classList.add('open');
-  }
-  rec.hits++;
-  const meta = [ev.count!=null?`~${ev.count} resultados`:null, ev.top?`↗ ${esc(ev.top)}`:null]
-                 .filter(Boolean).join(' · ');
-  const a = document.createElement('a');
-  a.className = 'dork hit'; a.target='_blank'; a.rel='noopener'; a.href = ev.url;
-  a.innerHTML = `<span class="q">${fmtDork(ev.query)}</span>
-                 <span class="meta">[${esc(ev.category)}] ${meta}</span>`;
-  rec.hitList.appendChild(a);
-  const h = rec.el.querySelector('.host-hits'); if(h) h.textContent = `${rec.hits} hallazgos`;
+/* --- ciclo de escaneo --- */
+function selectedTools(){
+  const t=[];
+  if($('s_crtsh').querySelector('input').checked)t.push('crtsh');
+  if($('s_subfinder').querySelector('input').checked&&!$('s_subfinder').querySelector('input').disabled)t.push('subfinder');
+  if($('s_amass').querySelector('input').checked&&!$('s_amass').querySelector('input').disabled)t.push('amass');
+  return t;
 }
-
-// ---- ciclo de escaneo ----
 function start(){
-  const domain = $('domain').value.trim().toLowerCase().replace(/^\*+\.?/,'');
-  if (!domain || !domain.includes('.')){ $('domain').focus(); return; }
+  const domain=$('domain').value.trim().toLowerCase().replace(/^\*+\.?/,'');
+  if(!domain||!domain.includes('.')){$('domain').focus();log('warn','ingresa un dominio válido');return;}
+  const demo=$('s_demo').querySelector('input').checked;
+  const tools=selectedTools();
+  if(!demo&&tools.length===0){log('warn','selecciona al menos una fuente (o activa modo demo)');return;}
   stop();
-  $('results').innerHTML = '';
-  hosts.clear();
-  const tools = [];
-  if ($('t_subfinder').checked) tools.push('subfinder');
-  if ($('t_amass').checked) tools.push('amass');
-  const provider = $('provider').value;
-  verifyMode = provider !== 'none' && $('api_key').value.trim() !== '';
+  $('results').innerHTML=''; hosts.clear(); $('log').innerHTML=''; logN=0; $('log_count').textContent='';
+  $('console').open=true; $('st_subs').textContent='0'; $('st_level').textContent='—'; $('st_src').textContent='—';
+  $('allfilter').style.display='none';
 
-  const p = new URLSearchParams({
-    domain, depth: $('depth').value, tools: tools.join(','),
-    demo: $('demo').checked ? '1':'0', provider,
-    api_key: $('api_key').value.trim(), cx: $('cx').value.trim(),
-    max_queries: $('max_queries').value, concurrency: $('concurrency').value,
-    delay: $('delay').value,
-  });
-  $('st_subs').textContent = '0';
-  $('st_budgetwrap').style.display = verifyMode ? '' : 'none';
-  setState('conectando…', true);
-  $('go').textContent = '■ Detener'; $('go').classList.add('stop');
+  const p=new URLSearchParams({domain,depth:$('depth').value,tools:tools.join(','),demo:demo?'1':'0'});
+  setState('conectando…',true);
+  log('info',`iniciando escaneo de ${domain} · fuentes: ${demo?'demo':tools.join(', ')} · profundidad ${$('depth').value}`);
+  $('go').textContent='■ Detener'; $('go').classList.add('scanning');
 
-  es = new EventSource('/api/scan/stream?' + p.toString());
-  es.onmessage = (m)=> handle(JSON.parse(m.data));
-  es.onerror = ()=>{ setState('conexión cerrada', false); stopES(); };
+  es=new EventSource('/api/scan/stream?'+p.toString());
+  es.onmessage=(m)=>handle(JSON.parse(m.data));
+  es.onerror=()=>{setState('conexión cerrada',false);log('warn','conexión SSE cerrada');stopES();};
 }
 
 function handle(ev){
   switch(ev.type){
     case 'start':
-      setState(ev.demo?'modo demo — enumerando…':'enumerando subdominios…', true); break;
+      setState(ev.demo?'modo demo…':'enumerando subdominios…',true);break;
     case 'tool_missing':
-      flashNote(`⚠ herramienta no encontrada en el servidor: ${ev.tool}`); break;
+      log('warn',`fuente no encontrada: ${ev.tool} (se omite)`);break;
     case 'level_start':
-      $('st_level').textContent = `${ev.level} (${ev.targets} objetivos)`; break;
-    case 'subdomain': {
-      const rec = addHost(ev.host, ev.level);
-      $('st_subs').textContent = hosts.size;
-      break; }
+      $('st_level').textContent=`${ev.level} · ${ev.targets} objetivo(s)`;
+      log('info',`— nivel ${ev.level}: ${ev.targets} objetivo(s) —`);break;
+    case 'tool_start':
+      $('st_src').textContent=ev.tool;
+      log('info',`▸ ${ev.tool} consultando ${ev.target}…`);break;
+    case 'subdomain':
+      addHost(ev.host,ev.level,ev.source);
+      log('sub',`  + ${ev.host}  (${ev.source})`);break;
+    case 'tool_done':
+      log(ev.new>0?'ok':'info',`✓ ${ev.tool} en ${ev.target}: ${ev.found} encontrados, ${ev.new} nuevos`);break;
+    case 'tool_error':
+      log('err',`✗ ${ev.tool} (${ev.target||'-'}): ${ev.message}`);break;
     case 'level_done':
-      $('st_level').textContent = `${ev.level} ✓`; break;
+      log('info',`nivel ${ev.level} listo · total ${ev.count} subdominios`);break;
     case 'enum_done':
-      setState(verifyMode ? 'verificando dorks…' : `enumeración lista · ${ev.count} subdominios`, verifyMode);
+      $('rh').textContent=`Resultados · ${ev.count} subdominios`;
+      if(hosts.size>1)$('allfilter').style.display='';
+      setState(`enumeración lista · ${ev.count} subdominios · abre un panel para ver los dorks`,false);
+      log('ok',`enumeración completa: ${ev.count} subdominios, ${ev.targets} objetivos para dorks`);
+      if(ev.count===0) showEmpty();
       break;
-    case 'dorks_start': setState(`verificando dorks en ${ev.host}…`, true); break;
-    case 'dork_hit': addHit(ev); break;
-    case 'dorks_done': break;
-    case 'verify_budget':
-      $('st_budget').textContent = ev.left; break;
-    case 'budget_exhausted': flashNote('⚠ cuota de API agotada; verificación detenida.'); break;
-    case 'verify_error': flashNote('⚠ error de verificación: ' + ev.message); break;
-    case 'limit': flashNote('⚠ límite de hosts alcanzado: ' + ev.max_hosts); break;
+    case 'limit':log('warn','límite de hosts alcanzado: '+ev.max_hosts);break;
     case 'done':
-      setState(`listo · ${ev.subdomains} subdominios · ${ev.targets} objetivos con dorks`, false);
-      stopES(); break;
+      setState(`✓ listo · ${ev.subdomains} subdominios`,false);
+      log('ok',`escaneo finalizado: ${ev.subdomains} subdominios`);stopES();break;
     case 'error':
-      setState('error: ' + ev.message, false); stopES(); break;
+      setState('error: '+ev.message,false);log('err',ev.message);stopES();break;
   }
 }
-
-let noteTimer;
-function flashNote(msg){
-  const n = $('scopeNote'); n.dataset.orig ??= n.innerHTML;
-  n.innerHTML = msg; clearTimeout(noteTimer);
-  noteTimer = setTimeout(()=> n.innerHTML = n.dataset.orig, 6000);
+function showEmpty(){
+  if(hosts.size>0)return;
+  $('results').innerHTML=`<div class="empty"><b>0 subdominios encontrados.</b><br>
+    <span style="font-size:12.5px">Posibles causas: el dominio tiene pocos subdominios públicos, o las fuentes
+    no devolvieron datos. Prueba: (1) activar más fuentes, (2) configurar claves API de subfinder
+    en <code>~/.config/subfinder/provider-config.yaml</code>, o (3) revisar la consola de actividad arriba.</span></div>`;
 }
 
-function stopES(){
-  if (es){ es.close(); es = null; }
-  $('go').textContent = '▶ Escanear'; $('go').classList.remove('stop');
-}
-function stop(){ if (es) { stopES(); setState('detenido', false); } }
+function stopES(){if(es){es.close();es=null;}$('go').textContent='▶ Escanear';$('go').classList.remove('scanning');}
+function stop(){if(es){stopES();setState('detenido',false);log('warn','escaneo detenido');}}
 
-$('go').addEventListener('click', ()=> es ? stop() : start());
-$('domain').addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
+$('go').addEventListener('click',()=>es?stop():start());
+$('domain').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
+$('allfilter').addEventListener('input',()=>{
+  const q=$('allfilter').value.toLowerCase();
+  hosts.forEach((rec,host)=>{rec.el.style.display=(!q||host.includes(q))?'':'none';});
+});
 </script>
 </body>
 </html>
