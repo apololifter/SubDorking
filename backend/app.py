@@ -18,8 +18,10 @@ from __future__ import annotations
 import asyncio
 import json
 import random
+import shutil
 from pathlib import Path
 
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
@@ -29,6 +31,8 @@ from verify import ping as searxng_ping, verify_host
 
 BASE = Path(__file__).resolve().parent.parent
 FRONTEND = BASE / "frontend" / "index.html"
+SEARXNG_SETTINGS = BASE / "searxng" / "settings.yml"
+SEARXNG_URL = "http://localhost:8888"
 
 app = FastAPI(title="SubDork")
 DORKS = DorkDB.load()
@@ -159,6 +163,71 @@ async def scan_stream(request: Request):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+# --------------------------- gestión de SearXNG ---------------------------
+
+async def _run_cmd(*args: str, timeout: int = 300):
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+    except FileNotFoundError:
+        return 127, "comando no encontrado"
+    try:
+        out, _ = await asyncio.wait_for(proc.communicate(), timeout)
+    except asyncio.TimeoutError:
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            pass
+        return 124, "timeout"
+    return proc.returncode, out.decode(errors="ignore")
+
+
+async def _searxng_ready() -> bool:
+    try:
+        async with httpx.AsyncClient(timeout=6) as c:
+            r = await c.get(f"{SEARXNG_URL}/search", params={"q": "test", "format": "json"})
+        if r.status_code != 200:
+            return False
+        r.json()
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
+@app.get("/api/searxng/status")
+async def searxng_status():
+    return {
+        "docker": shutil.which("docker") is not None,
+        "ready": await _searxng_ready(),
+        "url": SEARXNG_URL,
+    }
+
+
+@app.get("/api/searxng/up")
+async def searxng_up():
+    """Descarga/levanta y configura SearXNG con Docker (idempotente)."""
+    if await _searxng_ready():
+        return {"ok": True, "already": True, "url": SEARXNG_URL}
+    if shutil.which("docker") is None:
+        return {"ok": False, "error": "Docker no está instalado o no está en el PATH"}
+
+    # Recrea el contenedor con nuestra config (JSON habilitado, limiter off).
+    await _run_cmd("docker", "rm", "-f", "searxng", timeout=40)
+    args = ["docker", "run", "-d", "--name", "searxng", "-p", "8888:8080"]
+    if SEARXNG_SETTINGS.exists():
+        args += ["-v", f"{SEARXNG_SETTINGS}:/etc/searxng/settings.yml:ro"]
+    args += ["searxng/searxng"]
+    code, out = await _run_cmd(*args, timeout=600)  # el primer pull puede tardar
+    if code != 0:
+        return {"ok": False, "error": (out or "no se pudo crear el contenedor").strip()[:300]}
+
+    for _ in range(30):  # espera hasta ~60s a que responda JSON
+        if await _searxng_ready():
+            return {"ok": True, "url": SEARXNG_URL}
+        await asyncio.sleep(2)
+    return {"ok": False, "error": "SearXNG arrancó pero aún no responde JSON; reintenta el botón en unos segundos"}
 
 
 @app.get("/api/verify/ping")

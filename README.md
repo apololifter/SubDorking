@@ -111,17 +111,23 @@ Hay tres motores (selector en la barra de verificación):
 > verifica **pocas consultas** (30–50) con **delay 2s+ y concurrencia 1** por
 > endpoint. Para volumen alto, monta SearXNG (rota motores y aguanta más).
 
-1. Levanta SearXNG con Docker:
-   ```bash
-   docker run -d --name searxng -p 8888:8080 searxng/searxng
-   ```
-2. Habilita la API JSON: en su `settings.yml`, bloque `search:`, pon
-   `formats: [html, json]` y reinicia el contenedor. Si el *limiter* bloquea las
-   consultas, permite localhost o desactívalo.
-3. En SubDork, pega la URL (`http://localhost:8888`) y pulsa **probar conexión**.
-4. Elige un endpoint en el sidebar y pulsa **verificar hallazgos**. SubDork
-   consulta cada dork (con delay configurable) y va llenando la tabla en vivo solo
-   con los que tienen resultados.
+**Un clic (recomendado):** con Docker instalado, pulsa el botón **▶ SearXNG** en la
+barra de verificación. SubDork descarga la imagen, levanta el contenedor **ya
+configurado** (JSON habilitado, limiter off, usando `searxng/settings.yml` del
+repo) y selecciona el motor automáticamente. No tienes que tocar ningún archivo.
+
+**Manual (equivalente):**
+```bash
+docker run -d --name searxng -p 8888:8080 \
+  -v "$PWD/searxng/settings.yml:/etc/searxng/settings.yml:ro" \
+  searxng/searxng
+```
+El `settings.yml` incluido ya trae `formats: [html, json]` y `limiter: false`, que
+es lo que la API JSON necesita (sin eso SearXNG responde **403 Forbidden**).
+
+Luego elige un endpoint en el sidebar y pulsa **verificar hallazgos**: SubDork
+consulta cada dork (con delay configurable) y va llenando la tabla en vivo solo con
+los que tienen resultados.
 
 **Ojo:** la verificación consulta motores reales; usa `delay` y `máx. consultas`
 para no abusar. Los operadores de dork los soporta bien Google, pero solo

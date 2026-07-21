@@ -168,7 +168,10 @@
       <div><label>Máx.</label><input id="vmax" type="number" min="1" value="40" /></div>
       <div><label>Concurr.</label><input id="vconc" type="number" min="1" max="8" value="1" /></div>
       <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="2" /></div>
-      <div><button id="ping" class="btn btn-ping">probar</button></div>
+      <div style="display:flex;gap:6px">
+        <button id="sxup" class="btn btn-ping" title="descarga, levanta y configura SearXNG con Docker (un clic)">▶ SearXNG</button>
+        <button id="ping" class="btn btn-ping">probar</button>
+      </div>
       <div class="full"><span id="pingmsg"></span></div>
     </div>
   </div>
@@ -329,7 +332,7 @@ function renderFindings(host){
   const box=$('findings'); const rec=endpoints.get(host);
   $('hit_count').textContent=rec?rec.hits.length:0;
   if(!rec||rec.hits.length===0){
-    box.innerHTML='<div class="cat-empty">Sin hallazgos aún. Pulsa <b>verificar hallazgos</b> (requiere SearXNG).</div>';
+    box.innerHTML='<div class="cat-empty">Sin hallazgos aún. Elige el motor (Bing funciona sin instalar nada) y pulsa <b>verificar hallazgos</b>.</div>';
     return;
   }
   box.innerHTML=`<table><thead><tr><th>Dork</th><th>Categoría</th><th>Res.</th><th></th></tr></thead><tbody id="hitbody"></tbody></table>`;
@@ -478,7 +481,27 @@ function filterSidebar(){
   endpoints.forEach((rec,host)=>{ rec.item.style.display=(!q||host.includes(q))?'':'none'; });
 }
 
+/* ---------- levantar SearXNG con un clic ---------- */
+async function searxngUp(){
+  const b=$('sxup'); b.disabled=true; const old=b.textContent; b.textContent='…';
+  $('pingmsg').innerHTML='<span style="color:var(--muted)">levantando SearXNG con Docker (la primera vez baja la imagen, puede tardar)…</span>';
+  log('info','levantando SearXNG con Docker…');
+  try{
+    const r=await fetch('/api/searxng/up').then(x=>x.json());
+    if(r.ok){
+      $('vengine').value='searxng'; $('searxng').disabled=false; $('searxng').value=r.url||'http://localhost:8888';
+      $('pingmsg').innerHTML='<span style="color:var(--accent)">✓ SearXNG listo en '+esc(r.url||'')+(r.already?' (ya estaba corriendo)':'')+'</span>';
+      log('ok','SearXNG listo: '+(r.url||''));
+    }else{
+      $('pingmsg').innerHTML='<span style="color:var(--err)">✗ '+esc(r.error||'no se pudo levantar')+'</span>';
+      log('err','SearXNG: '+(r.error||''));
+    }
+  }catch(e){$('pingmsg').innerHTML='<span style="color:var(--err)">✗ '+esc(e.message)+'</span>';}
+  b.disabled=false; b.textContent=old;
+}
+
 /* ---------- eventos UI ---------- */
+$('sxup').addEventListener('click',searxngUp);
 $('go').addEventListener('click',()=>es?stop():start());
 $('domain').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
 $('verifyBtn').addEventListener('click',()=>{if(selected)verifyHost(selected);});

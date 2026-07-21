@@ -1,0 +1,15 @@
+# Config de SearXNG para SubDork.
+# Habilita la API JSON y desactiva el limiter para verificar dorks localmente.
+# Se monta dentro del contenedor en /etc/searxng/settings.yml
+# Docs: https://docs.searxng.org/admin/settings/
+use_default_settings: true
+
+server:
+  secret_key: "subdork-searxng-local-key-change-me"
+  limiter: false
+  image_proxy: true
+
+search:
+  formats:
+    - html
+    - json
