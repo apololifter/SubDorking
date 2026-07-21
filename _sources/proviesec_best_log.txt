@@ -1,0 +1,62 @@
+# APPLICATION / PHP / BACKEND
+filetype:log "PHP Fatal error"
+filetype:log "PHP Warning"
+filetype:log "PHP Parse error"
+filetype:log "Uncaught Exception"
+filetype:log "stack trace"
+inurl:error.log
+inurl:debug.log
+inurl:application.log
+# AUTH / CREDENTIAL LEAKS
+filetype:log "password="
+filetype:log "passwd="
+filetype:log "Authorization:"
+filetype:log "Bearer "
+filetype:log "Set-Cookie"
+filetype:log "SESSIONID"
+filetype:log "token="
+allintext:username password filetype:log
+# WEB SERVER LOGS
+filetype:log inurl:access.log
+filetype:log inurl:error.log
+filetype:log inurl:nginx
+filetype:log inurl:apache
+filetype:log inurl:httpd
+intitle:"index of" "access.log"
+intitle:"index of" "error.log"
+# DATABASE / BACKEND SERVICES
+filetype:log inurl:database
+filetype:log "SQLSTATE"
+filetype:log "PDOException"
+filetype:log "ORA-"
+filetype:log "mysql error"
+filetype:log "PostgreSQL"
+# CLOUD / CONTAINER / K8S
+filetype:log "kubernetes"
+filetype:log "kube-apiserver"
+filetype:log "containerd"
+filetype:log "docker"
+filetype:log "pod error"
+filetype:log "AWS_ACCESS_KEY_ID"
+filetype:log "AWS_SECRET_ACCESS_KEY"
+# CI / DEVOPS
+filetype:log "Jenkins"
+filetype:log "GitLab Runner"
+filetype:log "pipeline failed"
+filetype:log "build error"
+# SYSTEM / CRON
+filetype:log cron
+filetype:syslog
+filetype:log "CRON"
+filetype:log "sudo"
+filetype:log "ipsec"
+filetype:log "ConnectionManager"
+# NETWORK / SECURITY DEVICES
+filetype:log "firewall"
+filetype:log "VPN"
+filetype:log "SSL error"
+filetype:log "TLS handshake failed"
+# DIRECTORY LISTING
+intitle:"index of" filetype:log
+intitle:"index of" "log"
+intitle:"index of" cleanup.log

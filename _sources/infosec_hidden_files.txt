@@ -1,0 +1,180 @@
+Admin/Login Panels - Google Dorks:
+inurl:/cgi-bin/sqwebmail?noframes=1
+inurl:/Citrix/Nfuse17/
+inurl:/dana-na/auth/welcome.html
+inurl:/modcp/ intext:Moderator+vBulletin
+inurl:/SUSAdmin intitle:"Microsoft Software update Services"
+inurl:/webedit.* intext:WebEdit Professional -html
+inurl:1810 "Oracle Enterprise Manager"
+inurl:2000 intitle:RemotelyAnywhere -site:realvnc.com
+inurl:administrator "welcome to mambo"
+inurl:cgi-bin/ultimatebb.cgi?ubb=login
+inurl:Citrix/MetaFrame/default/default.aspx
+inurl:confixx inurl:login|anmeldung
+inurl:coranto.cgi intitle:Login (Authorized Users Only)
+inurl:csCreatePro.cgi
+inurl:default.asp intitle:"WebCommander"
+inurl:exchweb/bin/auth/owalogon.asp
+inurl:gnatsweb.pl
+inurl:ids5web
+inurl:irc filetype:cgi cgi:irc
+inurl:login filetype:swf
+inurl:login.asp
+inurl:login.cfm
+inurl:login.php "SquirrelMail version"
+inurl:metaframexp/default/login.asp | intitle:"Metaframe XP Login"
+inurl:mewebmail
+inurl:names.nsf?opendatabase
+inurl:ocw_login_username
+inurl:orasso.wwsso_app_admin.ls_login
+inurl:postfixadmin intitle:"postfix admin" ext:php
+inurl:search/admin.php
+inurl:textpattern/index.php
+inurl:WCP_USER
+inurl:webmail./index.pl "Interface"
+inurl:webvpn.html "login" "Please enter your"
+CCTV Camera online - Google Dorks:
+inurl:view/view.shtml
+inurl:/view.shtml
+intitle:"Live View / - AXIS" | inurl:view/view.shtml
+inurl:ViewerFrame?Mode=
+inurl:ViewerFrame?Mode=Refresh
+inurl:axis-cgi/jpg
+inurl:axis-cgi/mjpg
+inurl:view/indexFrame.shtml
+inurl:view/index.shtml
+intitle:start inurl:cgistart
+intitle:"live view" intitle:axis
+intitle:snc-z20 inurl:home/
+intitle:liveapplet
+intitle:"i-Catcher Console - Web Monitor"
+intitle:axis intitle:"video server"
+intitle:liveapplet inurl:LvAppl
+intitle:"EvoCam" inurl:"webcam.html"
+intitle:"Live NetSnap Cam-Server feed"
+intitle:"Live View / - AXIS 206W"
+intitle:"Live View / - AXIS 210"
+inurl:indexFrame.shtml Axis
+intitle:"Live View / - AXIS 206M"
+inurl:"MultiCameraFrame?Mode=Motion"
+allintitle:"Network Camera NetworkCamera"
+intitle:"WJ-NT104 Main Page"
+intext:"MOBOTIX M1" intext:"Open Menu"
+intext:"MOBOTIX M10" intext:"Open Menu"
+intext:"MOBOTIX D10" intext:"Open Menu"
+intitle:"netcam live image"
+intitle:snc-cs3 inurl:home/
+intitle:snc-rz30 inurl:home/
+intitle:"sony network camera snc-p1"
+intitle:"sony network camera snc-m1"
+site:.viewnetcam.com -www.viewnetcam.com
+intitle:"Toshiba Network Camera" user login
+allinurl:control/multiview
+intitle:"supervisioncam protocol"
+Local File Inclusion - Google Dorks:
+inurl:/view/lang/index.php?page=?page=
+inurl:/shared/help.php?page=
+inurl:include_file=
+inurl:include_path=
+inurl:incfile=
+inurl:openfile=
+inurl:showfile=
+inurl:path_to_calendar=
+Sensitive Data - Google Dorks:
+filetype:bak createobject sa
+filetype:bak inurl:"htaccess|passwd|shadow|htusers"
+filetype:cfg "mrtg" target
+filetype:cfm "cfapplication name" password
+filetype:conf oekakibbs
+filetype:conf slapd.conf
+filetype:config intext:appSettings "User ID"
+filetype:dat "password.dat"
+filetype:dat inurl:Sites.dat
+filetype:dat wand.dat
+filetype:inc dbconn
+filetype:inc intext:mysql_connect
+filetype:inc mysql_connect OR mysql_pconnect
+filetype:inf sysprep
+filetype:ini inurl:"serv-u.ini"
+filetype:ini inurl:flashFXP.ini
+filetype:ini ServUDaemon
+filetype:ini wcx_ftp
+filetype:ini ws_ftp pwd
+filetype:ldb admin
+filetype:log inurl:"password.log"
+filetype:mdb inurl:users.mdb
+filetype:netrc password
+filetype:pass pass intext:userid
+filetype:pem intext:private
+filetype:properties inurl:db intext:password
+filetype:pwd service
+filetype:reg reg +intext:"defaultusername" +intext:"defaultpassword"
+filetype:reg reg HKEY_CURRENT_USER SSHHOSTKEYS
+filetype:sql "insert into" (pass|passwd|password)
+filetype:sql +"IDENTIFIED BY" -cvs
+filetype:sql password
+filetype:url +inurl:"ftp://" +inurl:";@"
+filetype:xls username password email
+intitle:"index of" intext:connect.inc
+intitle:"index of" intext:globals.inc
+intitle:"Index of" passwords modified
+intitle:"Index of" sc_serv.conf sc_serv content
+intitle:index.of administrators.pwd
+intitle:Index.of etc shadow
+intitle:index.of intext:"secring.skr"|"secring.pgp"|"secring.bak"
+inurl:"calendarscript/users.txt"
+inurl:"GRC.DAT" intext:"password"
+inurl:"Sites.dat" "PASS="
+inurl:"slapd.conf" intext:"rootpw" -manpage -sample
+inurl:"wvdial.conf" intext:"password"
+inurl:/db/main.mdb
+inurl:/yabb/Members/Admin.dat
+inurl:ccbill filetype:log
+inurl:config.php dbuname dbpass
+inurl:filezilla.xml -cvs
+inurl:lilo.conf filetype:conf password
+inurl:pass.dat
+inurl:perform filetype:ini
+inurl:secring ext:skr | ext:pgp | ext:bak
+inurl:server.cfg rcon password
+inurl:ventrilo_srv.ini adminpassword
+inurl:vtund.conf intext:pass -cvs
+inurl:zebra.conf intext:password -sample
+filetype:conf inurl:firewall -intitle:cvs
+filetype:config web.config -CVS
+filetype:inf inurl:capolicy.inf
+filetype:log access.log -CVS
+filetype:pst inurl:"outlook.pst"
+filetype:reg "Terminal Server Client"
+filetype:xls inurl:"email.xls"
+inurl:email filetype:mdb
+inurl:backup filetype:mdb
+inurl:profiles filetype:mdb
+inurl:forum filetype:mdb
+inurl:admin filetype:xls
+inurl:admin intitle:login
+inurl:"/_layouts/settings"
+inurl:ssl.conf filetype:conf
+inurl:server-status "apache"
+inurl:server-info "Apache Server Information"
+ext:asa | ext:bak intext:uid intext:pwd -"uid..pwd"
+ext:inc "pwd=" "UID="
+ext:ini eudora.ini
+ext:passwd -intext:the -sample -example
+ext:txt inurl:unattend.txt
+ext:yml database inurl:config
+inurl:htpasswd filetype:htpasswd
+allinurl:auth_user_file.txt
+inurl:passlist.txt
+Error Messages - Google Dorks:
+"Warning: mysql_query()" "invalid query"
+"Warning: pg_connect(): Unable to connect to PostgreSQL server: FATAL"
+"Supplied argument is not a valid MySQL result resource"
+"You have an error in your SQL syntax"
+intitle:"Apache Tomcat" "Error Report"
+intext:"Warning: Failed opening" "on line" "include_path"
+ORA-00921: unexpected end of SQL command
+ORA-00936: missing expression
+"Invision Power Board Database Error"
+"ORA-00933: SQL command not properly ended"
+filetype:log "PHP Parse error" | "PHP Warning" | "PHP Error"

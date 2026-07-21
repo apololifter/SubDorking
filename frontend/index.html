@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SubDork · recon de subdominios + google dorks</title>
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #121821; --panel2: #0e141c; --border: #1e2a38;
+    --txt: #d7e0ea; --muted: #7c8794; --accent: #35d29a;
+    --accent2: #4aa8ff; --warn: #f2b545; --hit: #ff6a8b; --chip: #1b2836;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--txt);
+    font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  header {
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: .5px; }
+  header h1 span { color: var(--accent); }
+  header .sub { color: var(--muted); font-size: 12px; }
+  main { max-width: 1080px; margin: 0 auto; padding: 20px 22px 80px; }
+
+  .controls {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; display: grid; gap: 14px;
+    grid-template-columns: 2fr 1fr 1fr; align-items: end;
+  }
+  .controls .full { grid-column: 1 / -1; }
+  label { display: block; font-size: 11px; text-transform: uppercase;
+          letter-spacing: .6px; color: var(--muted); margin-bottom: 5px; }
+  input[type=text], input[type=number], select {
+    width: 100%; background: var(--panel2); border: 1px solid var(--border);
+    color: var(--txt); border-radius: 7px; padding: 9px 11px; font: inherit;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent2); }
+  .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .checkbox { display: flex; align-items: center; gap: 7px; font-size: 13px;
+              color: var(--txt); text-transform: none; letter-spacing: 0; }
+  .checkbox input { width: auto; }
+  button.go {
+    background: var(--accent); color: #062018; border: none; font: inherit;
+    font-weight: 700; padding: 10px 20px; border-radius: 7px; cursor: pointer;
+  }
+  button.go:disabled { opacity: .5; cursor: not-allowed; }
+  button.stop { background: var(--hit); color: #2a0810; }
+
+  .adv { border-top: 1px dashed var(--border); padding-top: 12px; }
+  .adv summary { cursor: pointer; color: var(--muted); font-size: 12px;
+                 text-transform: uppercase; letter-spacing: .6px; }
+  .adv .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+               margin-top: 12px; }
+
+  .statusbar { display: flex; gap: 18px; flex-wrap: wrap; margin: 18px 0 8px;
+               font-size: 12px; color: var(--muted); }
+  .statusbar b { color: var(--txt); }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+         background: var(--muted); margin-right: 6px; }
+  .dot.live { background: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .note { font-size: 12px; color: var(--muted); background: var(--panel2);
+          border: 1px solid var(--border); border-left: 3px solid var(--warn);
+          padding: 10px 12px; border-radius: 7px; margin: 12px 0; }
+
+  /* Paneles colapsables de subdominios */
+  .host {
+    border: 1px solid var(--border); border-radius: 9px; margin-top: 10px;
+    background: var(--panel); overflow: hidden;
+    animation: slidein .25s ease;
+  }
+  @keyframes slidein { from{opacity:0; transform: translateY(-4px)} to{opacity:1} }
+  .host > .hd {
+    display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+    cursor: pointer; user-select: none;
+  }
+  .host > .hd:hover { background: #16202c; }
+  .caret { transition: transform .15s; color: var(--muted); }
+  .host.open .caret { transform: rotate(90deg); }
+  .host .name { font-weight: 600; color: var(--txt); }
+  .host .name .tld { color: var(--muted); }
+  .chip { font-size: 11px; padding: 2px 8px; border-radius: 20px;
+          background: var(--chip); color: var(--muted); border: 1px solid var(--border); }
+  .chip.lvl { color: var(--accent2); }
+  .chip.hits { color: var(--hit); border-color: #3a2530; }
+  .chip.count { color: var(--accent); }
+  .grow { flex: 1; }
+  .host .body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
+  .host.open .body { display: block; }
+
+  .host-tools { display: flex; gap: 10px; align-items: center; margin: 12px 0 8px;
+                flex-wrap: wrap; }
+  .host-tools input[type=text] { max-width: 260px; padding: 6px 9px; }
+  .catbtn { font-size: 12px; }
+
+  .cat { border: 1px solid var(--border); border-radius: 7px; margin: 8px 0;
+         background: var(--panel2); }
+  .cat > .ch { padding: 8px 11px; cursor: pointer; display: flex; gap: 8px;
+               align-items: center; user-select: none; }
+  .cat > .ch:hover { background: #131b25; }
+  .cat .cname { color: var(--accent); font-size: 13px; }
+  .cat .cbody { display: none; padding: 4px 11px 10px; }
+  .cat.open .cbody { display: block; }
+  .dork { display: block; padding: 5px 8px; border-radius: 5px;
+          border: 1px solid transparent; margin: 3px 0; word-break: break-all; }
+  .dork:hover { background: #16202c; border-color: var(--border); text-decoration: none; }
+  .dork .q { color: var(--txt); }
+  .dork .op { color: var(--warn); }
+  .dork.hit { border-color: #3a2530; background: #1a1015; }
+  .dork .meta { color: var(--muted); font-size: 11px; margin-left: 6px; }
+
+  .empty { color: var(--muted); padding: 30px; text-align: center; }
+  footer { color: var(--muted); font-size: 11px; text-align: center; padding: 20px; }
+  code { background: var(--panel2); padding: 1px 5px; border-radius: 4px; color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sub<span>Dork</span></h1>
+  <span class="sub">enumeración recursiva de subdominios &rarr; google dorks en vivo</span>
+</header>
+
+<main>
+  <div class="controls">
+    <div>
+      <label>Dominio objetivo</label>
+      <input id="domain" type="text" placeholder="ejemplo.com" autocomplete="off" />
+    </div>
+    <div>
+      <label>Profundidad</label>
+      <input id="depth" type="number" min="1" max="4" value="2" />
+    </div>
+    <div>
+      <label>&nbsp;</label>
+      <button id="go" class="go">▶ Escanear</button>
+    </div>
+
+    <div class="full row">
+      <span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px">Herramientas:</span>
+      <label class="checkbox"><input type="checkbox" id="t_subfinder" checked /> subfinder</label>
+      <label class="checkbox"><input type="checkbox" id="t_amass" checked /> amass</label>
+      <label class="checkbox"><input type="checkbox" id="demo" /> modo demo (sin herramientas)</label>
+    </div>
+
+    <details class="adv full">
+      <summary>Verificación por API (opcional — muestra solo dorks con hallazgos)</summary>
+      <div class="grid">
+        <div>
+          <label>Proveedor</label>
+          <select id="provider">
+            <option value="none">Ninguno (links clicables)</option>
+            <option value="google_cse">Google CSE</option>
+            <option value="serpapi">SerpAPI</option>
+          </select>
+        </div>
+        <div>
+          <label>API key</label>
+          <input id="api_key" type="text" placeholder="tu API key" autocomplete="off" />
+        </div>
+        <div>
+          <label>cx (solo Google CSE)</label>
+          <input id="cx" type="text" placeholder="search engine id" autocomplete="off" />
+        </div>
+        <div>
+          <label>Máx. consultas</label>
+          <input id="max_queries" type="number" min="1" value="300" />
+        </div>
+        <div>
+          <label>Concurrencia</label>
+          <input id="concurrency" type="number" min="1" max="10" value="3" />
+        </div>
+        <div>
+          <label>Delay (s)</label>
+          <input id="delay" type="number" min="0" step="0.5" value="1" />
+        </div>
+      </div>
+      <p class="note" style="margin-top:12px">
+        Sin proveedor, cada dork es un enlace: al hacer clic se abre la búsqueda en Google.
+        Con proveedor, se consulta cada dork y solo aparecen los que devuelven resultados
+        (consume cuota de tu API).
+      </p>
+    </details>
+  </div>
+
+  <p class="note" id="scopeNote">
+    ⚠ Usa esto solo en dominios que tengas <b>autorización</b> para evaluar (tus activos,
+    bug bounty en alcance, pentest con permiso). El escaneo pasivo aun así es tu responsabilidad.
+  </p>
+
+  <div class="statusbar" id="status" style="display:none">
+    <span><span class="dot" id="livedot"></span><b id="st_state">—</b></span>
+    <span>subdominios: <b id="st_subs">0</b></span>
+    <span>nivel: <b id="st_level">—</b></span>
+    <span>dorks base: <b id="st_dorks">—</b></span>
+    <span id="st_budgetwrap" style="display:none">cuota API: <b id="st_budget">—</b></span>
+  </div>
+
+  <div id="results">
+    <div class="empty" id="emptyMsg">Ingresa un dominio y presiona <b>Escanear</b>.</div>
+  </div>
+</main>
+
+<footer>
+  SubDork · base local de <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías ·
+  reconocimiento OSINT para uso autorizado
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let DORKS = { categories: [], total: 0 };
+let es = null;                 // EventSource activo
+const hosts = new Map();       // host -> {el, bodyBuilt, verify, hitsEl, count}
+let verifyMode = false;
+
+// ---- construcción de la consulta (espejo de dorks.py) ----
+function buildQuery(host, dork) {
+  return /\bsite:/i.test(dork) ? dork : `site:${host} ${dork}`;
+}
+function googleUrl(host, dork) {
+  return "https://www.google.com/search?q=" + encodeURIComponent(buildQuery(host, dork));
+}
+function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+// resalta operadores tipo intitle: inurl: filetype: etc.
+function fmtDork(q){
+  return esc(q).replace(/\b(site|intitle|inurl|intext|filetype|ext|allintext|allinurl|cache|link|related|info):/g,
+    '<span class="op">$1:</span>');
+}
+
+// ---- carga inicial ----
+async function init(){
+  try {
+    const [d, c] = await Promise.all([
+      fetch('/api/dorks').then(r=>r.json()),
+      fetch('/api/config').then(r=>r.json())
+    ]);
+    DORKS = d;
+    $('f_dorks').textContent = d.total;
+    $('f_cats').textContent = d.categories.length;
+    $('st_dorks').textContent = d.total;
+    // marca herramientas no disponibles y sugiere demo
+    if (!c.tools.subfinder){ $('t_subfinder').checked=false; $('t_subfinder').parentElement.style.opacity=.5;
+      $('t_subfinder').parentElement.title='no instalado en el servidor'; }
+    if (!c.tools.amass){ $('t_amass').checked=false; $('t_amass').parentElement.style.opacity=.5;
+      $('t_amass').parentElement.title='no instalado en el servidor'; }
+    if (!c.tools.subfinder && !c.tools.amass){ $('demo').checked=true; }
+  } catch(e){ console.error(e); }
+}
+init();
+
+// ---- estado UI ----
+function setState(txt, live){
+  $('status').style.display='flex';
+  $('st_state').textContent = txt;
+  $('livedot').className = 'dot' + (live ? ' live' : '');
+}
+
+// ---- crear panel de subdominio ----
+function addHost(host, level){
+  if (hosts.has(host)) return hosts.get(host);
+  $('emptyMsg')?.remove();
+  const el = document.createElement('div');
+  el.className = 'host';
+  el.innerHTML = `
+    <div class="hd">
+      <span class="caret">▶</span>
+      <span class="name">${hostName(host)}</span>
+      <span class="chip lvl">nivel ${level}</span>
+      <span class="grow"></span>
+      <span class="chip count host-count">${DORKS.total} dorks</span>
+      ${verifyMode ? '<span class="chip hits host-hits">0 hallazgos</span>' : ''}
+    </div>
+    <div class="body"></div>`;
+  const rec = { el, bodyBuilt:false, count: DORKS.total, hits:0 };
+  el.querySelector('.hd').addEventListener('click', ()=> toggleHost(host));
+  $('results').appendChild(el);
+  hosts.set(host, rec);
+  return rec;
+}
+function hostName(host){
+  const i = host.indexOf('.');
+  return `<span>${esc(host.slice(0,i))}</span><span class="tld">${esc(host.slice(i))}</span>`;
+}
+
+function toggleHost(host){
+  const rec = hosts.get(host); if(!rec) return;
+  const open = rec.el.classList.toggle('open');
+  if (open && !rec.bodyBuilt && !verifyMode) buildHostBody(host, rec);
+}
+
+// ---- construir cuerpo (modo links, lazy) ----
+function buildHostBody(host, rec){
+  const body = rec.el.querySelector('.body');
+  const tools = document.createElement('div');
+  tools.className = 'host-tools';
+  tools.innerHTML = `
+    <input type="text" placeholder="filtrar categorías/dorks…" />
+    <button class="go catbtn" data-a="expand">expandir todo</button>
+    <button class="go catbtn" data-a="collapse">colapsar todo</button>`;
+  body.appendChild(tools);
+  const list = document.createElement('div');
+  body.appendChild(list);
+
+  DORKS.categories.forEach(cat => {
+    const c = document.createElement('div');
+    c.className = 'cat';
+    const dorksHtml = cat.dorks.map(dk =>
+      `<a class="dork" target="_blank" rel="noopener" href="${googleUrl(host, dk)}">
+         <span class="q">${fmtDork(buildQuery(host, dk))}</span></a>`).join('');
+    c.innerHTML = `
+      <div class="ch"><span class="caret">▶</span>
+        <span class="cname">${esc(cat.category)}</span>
+        <span class="grow"></span><span class="chip">${cat.dorks.length}</span></div>
+      <div class="cbody">${dorksHtml}</div>`;
+    c.querySelector('.ch').addEventListener('click', ()=> c.classList.toggle('open'));
+    list.appendChild(c);
+  });
+
+  const filt = tools.querySelector('input');
+  filt.addEventListener('input', ()=>{
+    const q = filt.value.toLowerCase();
+    list.querySelectorAll('.cat').forEach(c=>{
+      const name = c.querySelector('.cname').textContent.toLowerCase();
+      let any = false;
+      c.querySelectorAll('.dork').forEach(d=>{
+        const show = !q || d.textContent.toLowerCase().includes(q) || name.includes(q);
+        d.style.display = show ? '' : 'none'; if(show) any = true;
+      });
+      c.style.display = (any || !q) ? '' : 'none';
+      if (q && any) c.classList.add('open');
+    });
+  });
+  tools.querySelectorAll('.catbtn').forEach(b=> b.addEventListener('click', ()=>{
+    const open = b.dataset.a==='expand';
+    list.querySelectorAll('.cat').forEach(c=> c.classList.toggle('open', open));
+  }));
+  rec.bodyBuilt = true;
+}
+
+// ---- modo verificación: añadir un hallazgo ----
+function addHit(ev){
+  let rec = hosts.get(ev.host) || addHost(ev.host, 0);
+  if (!rec.bodyBuilt){
+    const body = rec.el.querySelector('.body');
+    body.innerHTML = `<div class="host-tools"><b style="color:var(--muted)">Hallazgos verificados:</b></div>
+                      <div class="hitlist"></div>`;
+    rec.hitList = body.querySelector('.hitlist');
+    rec.bodyBuilt = true;
+    rec.el.classList.add('open');
+  }
+  rec.hits++;
+  const meta = [ev.count!=null?`~${ev.count} resultados`:null, ev.top?`↗ ${esc(ev.top)}`:null]
+                 .filter(Boolean).join(' · ');
+  const a = document.createElement('a');
+  a.className = 'dork hit'; a.target='_blank'; a.rel='noopener'; a.href = ev.url;
+  a.innerHTML = `<span class="q">${fmtDork(ev.query)}</span>
+                 <span class="meta">[${esc(ev.category)}] ${meta}</span>`;
+  rec.hitList.appendChild(a);
+  const h = rec.el.querySelector('.host-hits'); if(h) h.textContent = `${rec.hits} hallazgos`;
+}
+
+// ---- ciclo de escaneo ----
+function start(){
+  const domain = $('domain').value.trim().toLowerCase().replace(/^\*+\.?/,'');
+  if (!domain || !domain.includes('.')){ $('domain').focus(); return; }
+  stop();
+  $('results').innerHTML = '';
+  hosts.clear();
+  const tools = [];
+  if ($('t_subfinder').checked) tools.push('subfinder');
+  if ($('t_amass').checked) tools.push('amass');
+  const provider = $('provider').value;
+  verifyMode = provider !== 'none' && $('api_key').value.trim() !== '';
+
+  const p = new URLSearchParams({
+    domain, depth: $('depth').value, tools: tools.join(','),
+    demo: $('demo').checked ? '1':'0', provider,
+    api_key: $('api_key').value.trim(), cx: $('cx').value.trim(),
+    max_queries: $('max_queries').value, concurrency: $('concurrency').value,
+    delay: $('delay').value,
+  });
+  $('st_subs').textContent = '0';
+  $('st_budgetwrap').style.display = verifyMode ? '' : 'none';
+  setState('conectando…', true);
+  $('go').textContent = '■ Detener'; $('go').classList.add('stop');
+
+  es = new EventSource('/api/scan/stream?' + p.toString());
+  es.onmessage = (m)=> handle(JSON.parse(m.data));
+  es.onerror = ()=>{ setState('conexión cerrada', false); stopES(); };
+}
+
+function handle(ev){
+  switch(ev.type){
+    case 'start':
+      setState(ev.demo?'modo demo — enumerando…':'enumerando subdominios…', true); break;
+    case 'tool_missing':
+      flashNote(`⚠ herramienta no encontrada en el servidor: ${ev.tool}`); break;
+    case 'level_start':
+      $('st_level').textContent = `${ev.level} (${ev.targets} objetivos)`; break;
+    case 'subdomain': {
+      const rec = addHost(ev.host, ev.level);
+      $('st_subs').textContent = hosts.size;
+      break; }
+    case 'level_done':
+      $('st_level').textContent = `${ev.level} ✓`; break;
+    case 'enum_done':
+      setState(verifyMode ? 'verificando dorks…' : `enumeración lista · ${ev.count} subdominios`, verifyMode);
+      break;
+    case 'dorks_start': setState(`verificando dorks en ${ev.host}…`, true); break;
+    case 'dork_hit': addHit(ev); break;
+    case 'dorks_done': break;
+    case 'verify_budget':
+      $('st_budget').textContent = ev.left; break;
+    case 'budget_exhausted': flashNote('⚠ cuota de API agotada; verificación detenida.'); break;
+    case 'verify_error': flashNote('⚠ error de verificación: ' + ev.message); break;
+    case 'limit': flashNote('⚠ límite de hosts alcanzado: ' + ev.max_hosts); break;
+    case 'done':
+      setState(`listo · ${ev.subdomains} subdominios · ${ev.targets} objetivos con dorks`, false);
+      stopES(); break;
+    case 'error':
+      setState('error: ' + ev.message, false); stopES(); break;
+  }
+}
+
+let noteTimer;
+function flashNote(msg){
+  const n = $('scopeNote'); n.dataset.orig ??= n.innerHTML;
+  n.innerHTML = msg; clearTimeout(noteTimer);
+  noteTimer = setTimeout(()=> n.innerHTML = n.dataset.orig, 6000);
+}
+
+function stopES(){
+  if (es){ es.close(); es = null; }
+  $('go').textContent = '▶ Escanear'; $('go').classList.remove('stop');
+}
+function stop(){ if (es) { stopES(); setState('detenido', false); } }
+
+$('go').addEventListener('click', ()=> es ? stop() : start());
+$('domain').addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
+</script>
+</body>
+</html>

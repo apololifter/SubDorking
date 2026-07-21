@@ -1,0 +1,3172 @@
+{
+ "source": "GDorks + BullsEye0 + Proviesec + sushiwushi + 0xAbbarhSF (via cipher387 collection)",
+ "categories": [
+  {
+   "category": "Website Vulnerabilities",
+   "dorks": [
+    "intext:\"error_reporting(E_ALL)\" intitle:\"phpinfo()\" -github.com",
+    "intext:\"sql_query\" inurl:\"admin.php\" -github.com",
+    "inurl:\"config.inc.php\" OR inurl:\"config/config.ini.php\" OR inurl:\"config/config.php\" -github.com",
+    "intitle:\"index of\" intext:\"wp-config.php\" -github.com",
+    "inurl:\"upload.php\" intext:\"File Upload\" -github.com",
+    "inurl:\"error_log\" intext:\"PHP Error logs\" -github.com",
+    "inurl:\"login.php\" intext:\"Login Page\" -github.com",
+    "inurl:\"login.html\" intext:\"Admin Login\" -github.com"
+   ]
+  },
+  {
+   "category": "Exposed APIs",
+   "dorks": [
+    "intext:\"API_KEY\" -github.com",
+    "inurl:\"api/v1\" -github.com",
+    "inurl:\"swagger.json\" -github.com",
+    "inurl:\"/graphql\" -github.com",
+    "inurl:\"/api-docs\" -github.com",
+    "inurl:\"/api/v2\" -github.com",
+    "inurl:\"/api/v3\" -github.com"
+   ]
+  },
+  {
+   "category": "Sensitive Information",
+   "dorks": [
+    "intext:\"-----BEGIN PRIVATE KEY-----\" -github.com",
+    "intext:\"client_secret\" -github.com",
+    "intext:\"password\" filetype:env -github.com",
+    "intext:\"apikey\" filetype:env -github.com",
+    "intext:\"username\" filetype:env -github.com",
+    "intext:\"jdbc.password\" -github.com",
+    "intext:\"oauth.token\" -github.com",
+    "filetype:log \"secret_key\"",
+    "filetype:log \"password\""
+   ]
+  },
+  {
+   "category": "Download.php Files",
+   "dorks": [
+    "inurl:download.php?file=",
+    "intitle:\"Index of /\" inurl:download.php",
+    "intitle:\"Download\" inurl:download.php",
+    "intitle:\"Download File\" inurl:download.php",
+    "intitle:\"File Download\" inurl:download.php",
+    "intitle:\"Download Page\" inurl:download.php",
+    "intitle:\"Download Link\" inurl:download.php",
+    "intitle:\"Download Resource\" inurl:download.php",
+    "intitle:\"Download Center\" inurl:download.php",
+    "intitle:\"Download Manager\" inurl:download.php",
+    "intitle:\"Download Script\" inurl:download.php",
+    "intitle:\"File URL\" inurl:download.php",
+    "intitle:\"File Path\" inurl:download.php",
+    "intitle:\"Direct Download\" inurl:download.php",
+    "intitle:\"Downloadable File\" inurl:download.php",
+    "intitle:\"File Repository\" inurl:download.php",
+    "intitle:\"File Hosting\" inurl:download.php",
+    "intitle:\"File Distribution\" inurl:download.php",
+    "intitle:\"Downloadable Resource\" inurl:download.php"
+   ]
+  },
+  {
+   "category": "Download.php Files with Parameter Names",
+   "dorks": [
+    "inurl:download.php?file=",
+    "inurl:download.php?name=",
+    "inurl:download.php?filename=",
+    "inurl:download.php?download=",
+    "inurl:download.php?file_id=",
+    "inurl:download.php?file_name=",
+    "inurl:download.php?filepath=",
+    "inurl:download.php?resource=",
+    "inurl:download.php?item=",
+    "inurl:download.php?attachment=",
+    "inurl:download.php?doc=",
+    "inurl:download.php?type=",
+    "inurl:download.php?link=",
+    "inurl:download.php?url=",
+    "inurl:download.php?target=",
+    "inurl:download.php?source=",
+    "inurl:download.php?content=",
+    "inurl:download.php?document=",
+    "inurl:download.php?data=",
+    "inurl:download.php?product=",
+    "inurl:download.php?code=",
+    "inurl:download.php?key=",
+    "inurl:download.php?source_file=",
+    "inurl:download.php?output=",
+    "inurl:download.php?resource_path=",
+    "inurl:download.php?target_file=",
+    "inurl:download.php?resource_url=",
+    "inurl:download.php?file_path=",
+    "inurl:download.php?file_url=",
+    "inurl:download.php?attachment_id=",
+    "inurl:download.php?file_location="
+   ]
+  },
+  {
+   "category": "Download.php Files with Different URL Structures",
+   "dorks": [
+    "inurl:\"/downloads/download.php?file=\"",
+    "inurl:\"/files/download.php?name=\"",
+    "inurl:\"/file/download.php?filename=\"",
+    "inurl:\"/dl/download.php?file=\"",
+    "inurl:\"/dl/download.php?name=\"",
+    "inurl:\"/dl/download.php?filename=\"",
+    "inurl:\"/getfile/download.php?file=\"",
+    "inurl:\"/getfile/download.php?name=\"",
+    "inurl:\"/getfile/download.php?filename=\"",
+    "inurl:\"/download-files/download.php?file=\"",
+    "inurl:\"/download-files/download.php?name=\"",
+    "inurl:\"/download-files/download.php?filename=\"",
+    "inurl:\"/download-resource/download.php?file=\"",
+    "inurl:\"/download-resource/download.php?name=\"",
+    "inurl:\"/download-resource/download.php?filename=\"",
+    "inurl:\"/file-download/download.php?file=\"",
+    "inurl:\"/file-download/download.php?name=\"",
+    "inurl:\"/file-download/download.php?filename=\"",
+    "inurl:\"/content-download/download.php?file=\"",
+    "inurl:\"/content-download/download.php?name=\"",
+    "inurl:\"/content-download/download.php?filename=\"",
+    "inurl:\"/resource-download/download.php?file=\"",
+    "inurl:\"/resource-download/download.php?name=\"",
+    "inurl:\"/resource-download/download.php?filename=\"",
+    "inurl:\"/download-link/download.php?url=\"",
+    "inurl:\"/download-link/download.php?link=\"",
+    "inurl:\"/download-link/download.php?source=\"",
+    "inurl:\"/download-link/download.php?content=\"",
+    "inurl:\"/download-link/download.php?document=\""
+   ]
+  },
+  {
+   "category": "Backup Files",
+   "dorks": [
+    "intitle:\"index of\" \"backup\" -github.com",
+    "intitle:\"index of\" \"backups\" -github.com",
+    "inurl:\"/backup/\" -github.com",
+    "inurl:\"/backup\" -github.com",
+    "intext:\"backup.sql\" -github.com",
+    "intext:\"backup.zip\" -github.com",
+    "inurl:\"/backup\" filetype:zip -github.com",
+    "filetype:bkf \"Microsoft's Backup Utility\""
+   ]
+  },
+  {
+   "category": "Login Pages",
+   "dorks": [
+    "intitle:\"Login\" inurl:\"admin\" -github.com",
+    "intitle:\"Sign In\" inurl:\"admin\" -github.com",
+    "intitle:\"Member Login\" -github.com",
+    "intitle:\"User Login\" -github.com",
+    "intitle:\"Staff Login\" -github.com",
+    "inurl:index.php?id=",
+    "inurl:article.php?id=",
+    "inurl:gallery.php?id=",
+    "inurl:news.php?id=",
+    "inurl:product.php?id=",
+    "inurl:category.php?id=",
+    "inurl:content.php?id=",
+    "inurl:download.php?id=",
+    "inurl:profile.php?id=",
+    "inurl:shop.php?id=",
+    "inurl:show.php?id=",
+    "inurl:item.php?id=",
+    "inurl:review.php?id=",
+    "inurl:read.php?id=",
+    "inurl:faq.php?id=",
+    "inurl:search.php?id=",
+    "inurl:archive.php?id=",
+    "inurl:event.php?id=",
+    "inurl:calendar.php?id=",
+    "inurl:login.php?id=",
+    "inurl:register.php?id=",
+    "inurl:checkout.php?id=",
+    "inurl:confirm.php?id=",
+    "inurl:process.php?id=",
+    "filetype:php intext:\"SQL syntax\"",
+    "filetype:asp inurl:\"id=\" intext:\"OleDbException\"",
+    "filetype:log intext:\"You have an error in your SQL syntax\"",
+    "inurl:\".php?param=\"",
+    "inurl:\".php?id=\"",
+    "inurl:\"page.php?id=\"",
+    "inurl:\"product-detail.php?id=\"",
+    "inurl:\"viewitem.php?id=\"",
+    "inurl:\"news_detail.php?id=\"",
+    "inurl:\"post.php?id=\"",
+    "inurl:\"event.php?id=\"",
+    "inurl:\"category.php?id=\"",
+    "inurl:\"download.php?id=\"",
+    "inurl:\"content.php?id=\"",
+    "inurl:\"index.php?id=\"",
+    "inurl:\"gallery.php?id=\"",
+    "inurl:\"news.php?id=\"",
+    "inurl:\"product.php?id=\"",
+    "inurl:\"profile.php?id=\"",
+    "inurl:\"shop.php?id=\"",
+    "inurl:\"show.php?id=\"",
+    "inurl:\"item.php?id=\"",
+    "inurl:\"review.php?id=\"",
+    "inurl:\"read.php?id=\"",
+    "inurl:\"faq.php?id=\"",
+    "inurl:\"search.php?id=\"",
+    "inurl:\"archive.php?id=\"",
+    "inurl:\"calendar.php?id=\"",
+    "inurl:\"login.php?id=\"",
+    "inurl:\"register.php?id=\"",
+    "inurl:\"checkout.php?id=\"",
+    "inurl:\"confirm.php?id=\"",
+    "inurl:\"process.php?id=\"",
+    "inurl:*.php?*",
+    "inurl:*.asp?*",
+    "inurl:*.aspx?*",
+    "inurl:*.jsp?*",
+    "filetype:asp \"OleDbException\"",
+    "filetype:log \"SQL syntax\"",
+    "filetype:txt \"SQL syntax error\"",
+    "filetype:txt \"union select\"",
+    "filetype:log \"union select\"",
+    "filetype:txt \"mysqli_num_rows()\"",
+    "filetype:log \"mysql_fetch_array()\"",
+    "filetype:txt \"ORDER BY\"",
+    "filetype:log \"ORDER BY\"",
+    "inurl:\".php?category_id=\"",
+    "inurl:\".php?product_id=\"",
+    "inurl:\".php?article_id=\"",
+    "inurl:\".php?post_id=\"",
+    "inurl:\".php?event_id=\"",
+    "inurl:\".php?calendar_id=\"",
+    "inurl:\".php?news_id=\"",
+    "inurl:\".php?item_id=\"",
+    "intext:\"You have an error in your SQL syntax near\"",
+    "intext:\"SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near\"",
+    "intext:\"query failed: ERROR: parser: parse error\"",
+    "inurl:\"login.php?username=\"",
+    "inurl:\"login.aspx?user=\"",
+    "inurl:\"signin.php?user=\"",
+    "inurl:\"auth.php?user=\"",
+    "inurl:\"signin.asp?user=\"",
+    "inurl:\"login.jsp?user=\"",
+    "inurl:\"search.php?query=\"",
+    "inurl:\"search.aspx?keyword=\"",
+    "inurl:\"search.asp?q=\"",
+    "inurl:\"search.jsp?query=\"",
+    "inurl:\"profile.php?user_id=\"",
+    "inurl:\"profile.aspx?userid=\"",
+    "inurl:\"user.php?id=\"",
+    "inurl:\"user.aspx?user_id=\"",
+    "inurl:\"product.php?pid=\"",
+    "inurl:\"product.aspx?id=\"",
+    "inurl:\"item.php?item_id=\"",
+    "inurl:\"item.aspx?prodid=\"",
+    "inurl:\"forum.php?topic=\"",
+    "inurl:\"forum.aspx?topic_id=\"",
+    "inurl:\"thread.php?tid=\"",
+    "inurl:\"thread.aspx?threadid=\"",
+    "inurl:\"news.php?nid=\"",
+    "inurl:\"news.aspx?newsid=\"",
+    "inurl:\"article.php?article_id=\"",
+    "inurl:\"article.aspx?id=\"",
+    "inurl:\"category.php?cat_id=\"",
+    "inurl:\"category.aspx?id=\"",
+    "inurl:\"blog.php?post_id=\"",
+    "inurl:\"blog.aspx?id=\"",
+    "inurl:\"register.php?user=\"",
+    "inurl:\"register.aspx?username=\"",
+    "inurl:\"signup.php?username=\"",
+    "inurl:\"forgot_password.php?email=\"",
+    "inurl:\"forgotpassword.aspx?email=\"",
+    "inurl:\"contact.php?name=\"",
+    "inurl:\"contact.aspx?fullname=\"",
+    "inurl:\"feedback.php?message=\"",
+    "inurl:\"feedback.aspx?msg=\"",
+    "inurl:\"survey.php?survey_id=\"",
+    "inurl:\"survey.aspx?id=\"",
+    "inurl:\"poll.php?id=\"",
+    "inurl:\"poll.aspx?pollid=\"",
+    "inurl:\"comments.php?post_id=\"",
+    "inurl:\"comments.aspx?postid=\"",
+    "inurl:\"cms.php?page_id=\"",
+    "inurl:\"cms.aspx?id=\"",
+    "inurl:\"checkout.php?order_id=\"",
+    "intitle:\"Login\" inurl:/login",
+    "intitle:\"Login\" inurl:/signin",
+    "intitle:\"Login\" inurl:/log-in",
+    "intitle:\"Login\" inurl:/sign-in",
+    "intitle:\"Login\" inurl:/account/login",
+    "intitle:\"Login\" inurl:/user/login",
+    "intitle:\"Login\" inurl:/members/login",
+    "intitle:\"Login\" inurl:/auth/login"
+   ]
+  },
+  {
+   "category": "Cross-Site Scripting (XSS)",
+   "dorks": [
+    "inurl:/search?query=<script>alert('XSS')</script>",
+    "inurl:/login?username=<script>alert('XSS')</script>",
+    "inurl:/signin?email=<script>alert('XSS')</script>",
+    "inurl:/register?fullname=<script>alert('XSS')</script>",
+    "inurl:/contact?message=<script>alert('XSS')</script>",
+    "inurl:/comment?text=<script>alert('XSS')</script>",
+    "inurl:/feedback?subject=<script>alert('XSS')</script>",
+    "inurl:/guestbook?message=<script>alert('XSS')</script>",
+    "inurl:/feedback?comment=<script>alert('XSS')</script>",
+    "inurl:/post?body=<script>alert('XSS')</script>",
+    "inurl:/search?q=<script>alert('XSS')</script>",
+    "inurl:/profile?username=<script>alert('XSS')</script>",
+    "inurl:/user?name=<script>alert('XSS')</script>",
+    "inurl:/about?content=<script>alert('XSS')</script>",
+    "inurl:/portfolio?project=<script>alert('XSS')</script>",
+    "inurl:/testimonial?feedback=<script>alert('XSS')</script>"
+   ]
+  },
+  {
+   "category": "XSS in JavaScript Files",
+   "dorks": [
+    "filetype:js \"<script>alert('XSS')</script>\"",
+    "filetype:js \"document.write('<script>alert('XSS')</script>')\"",
+    "filetype:js \"window.location.href='javascript:alert('XSS')'\"",
+    "filetype:js \"eval('<script>alert('XSS')</script>')\""
+   ]
+  },
+  {
+   "category": "XSS in HTML Files",
+   "dorks": [
+    "filetype:html \"<script>alert('XSS')</script>\"",
+    "filetype:html \"onload=alert('XSS')\"",
+    "filetype:html \"onclick=alert('XSS')\"",
+    "filetype:html \"onmouseover=alert('XSS')\""
+   ]
+  },
+  {
+   "category": "XSS in URL Parameters",
+   "dorks": [
+    "inurl:/page?name=<script>alert('XSS')</script>",
+    "inurl:/search?query=<script>alert('XSS')</script>",
+    "inurl:/profile?id=<script>alert('XSS')</script>",
+    "inurl:/article?title=<script>alert('XSS')</script>",
+    "inurl:/post?id=<script>alert('XSS')</script>",
+    "inurl:/view?item=<script>alert('XSS')</script>",
+    "inurl:/category?name=<script>alert('XSS')</script>"
+   ]
+  },
+  {
+   "category": "XSS in Form Fields",
+   "dorks": [
+    "intext:\"<form action\" \"<input type='text' onfocus='alert('XSS')'>\"",
+    "intext:\"<form action\" \"<textarea onfocus='alert('XSS')'></textarea>\"",
+    "intext:\"<form action\" \"<input type='password' onfocus='alert('XSS')'>\"",
+    "intext:\"<form action\" \"<input type='email' onfocus='alert('XSS')'>\"",
+    "intext:\"<form action\" \"<input type='url' onfocus='alert('XSS')'>\"",
+    "intext:\"<form action\" \"<input type='tel' onfocus='alert('XSS')'>\"",
+    "intext:\"<form action\" \"<input type='number' onfocus='alert('XSS')'>\""
+   ]
+  },
+  {
+   "category": "XSS in Event Handlers",
+   "dorks": [
+    "intext:\"<button onclick='alert('XSS')'>Click Me</button>\"",
+    "intext:\"<a href='#' onclick='alert('XSS')'>Click Here</a>\"",
+    "intext:\"<div onmouseover='alert('XSS')'>Hover Me</div>\"",
+    "intext:\"<img src='x' onerror='alert('XSS')'>\"",
+    "intext:\"<input type='text' onblur='alert('XSS')'>\"",
+    "intext:\"<select onchange='alert('XSS')'><option>Select</option></select>\""
+   ]
+  },
+  {
+   "category": "Exposed Documents",
+   "dorks": [
+    "filetype:doc OR filetype:docx OR filetype:ppt OR filetype:pptx OR filetype:xls OR filetype:xlsx OR filetype:pdf -github.com",
+    "filetype:pdf \"Confidential\"",
+    "filetype:pdf \"Internal Use Only\"",
+    "filetype:pdf \"Not for Distribution\"",
+    "filetype:doc \"Confidential\"",
+    "filetype:doc \"Internal Use Only\"",
+    "filetype:doc \"Not for Distribution\"",
+    "filetype:xls \"Confidential\"",
+    "filetype:xls \"Internal Use Only\"",
+    "filetype:xls \"Not for Distribution\""
+   ]
+  },
+  {
+   "category": "Exposed Source Code",
+   "dorks": [
+    "inurl:\"/src/\" -github.com",
+    "inurl:\"/source/\" -github.com",
+    "inurl:\"/code/\" -github.com",
+    "inurl:\"/src/\" language:python -github.com",
+    "inurl:\"/src/\" language:java -github.com",
+    "inurl:\"/src/\" language:javascript -github.com"
+   ]
+  },
+  {
+   "category": "Wordpress Configuration Files",
+   "dorks": [
+    "filetype:php intext:\"DB_PASSWORD\" -github.com",
+    "filetype:php intext:\"DB_HOST\" -github.com",
+    "filetype:php intext:\"DB_USER\" -github.com",
+    "filetype:php intext:\"DB_NAME\" -github.com"
+   ]
+  },
+  {
+   "category": "Open Directory Listings",
+   "dorks": [
+    "intitle:\"Index of /\" + \"backup\" -github.com",
+    "intitle:\"Index of /\" + \"uploads\" -github.com",
+    "intitle:\"Index of /\" + \"confidential\" -github.com",
+    "intitle:\"Index of /\" + \"backup\""
+   ]
+  },
+  {
+   "category": "Exposed Private Keys",
+   "dorks": [
+    "filetype:txt \"private_key\" -github.com",
+    "filetype:txt \"private.key\" -github.com",
+    "filetype:txt \"private_key.pem\" -github.com",
+    "filetype:txt \"private_key.txt\" -github.com",
+    "filetype:pem \"PRIVATE KEY\"",
+    "filetype:key \"BEGIN RSA PRIVATE KEY\""
+   ]
+  },
+  {
+   "category": "Sensitive Files",
+   "dorks": [
+    "filetype:log inurl:\"access.log\" -github.com",
+    "filetype:log inurl:\"error.log\" -github.com",
+    "filetype:log inurl:\"debug.log\" -github.com",
+    "filetype:log inurl:\"application.log\" -github.com"
+   ]
+  },
+  {
+   "category": "Open Redirect Vulnerabilities",
+   "dorks": [
+    "inurl:\"redirect?to=\" -github.com",
+    "inurl:\"out?url=\" -github.com",
+    "inurl:\"link?url=\" -github.com",
+    "inurl:\"/go?url=\" -github.com",
+    "inurl:\"/out?url=\" -github.com",
+    "inurl:redir?url=",
+    "inurl:url=",
+    "inurl:redirect?url=",
+    "inurl:link?url=",
+    "inurl:out?url=",
+    "inurl:to?url=",
+    "inurl:go?url=",
+    "inurl:open?url=",
+    "inurl:leave?url=",
+    "inurl:redirect?to=",
+    "inurl:\"redirect.php?url=\"",
+    "inurl:\"go.php?url=\"",
+    "inurl:\"out.php?url=\"",
+    "inurl:\"leave.php?url=\"",
+    "inurl:\"to.php?url=\"",
+    "inurl:\"outgoing.php?url=\"",
+    "inurl:\"redirecting.php?url=\"",
+    "inurl:\"forward.php?url=\""
+   ]
+  },
+  {
+   "category": "Git Repository Files",
+   "dorks": [
+    "filetype:gitweb inurl:\"/?a=summary\" -github.com",
+    "filetype:git inurl:\".gitignore\" -github.com",
+    "filetype:git inurl:\"config\" -github.com",
+    "filetype:git inurl:\"HEAD\" -github.com",
+    "filetype:git inurl:\"index\" -github.com",
+    "filetype:git inurl:\"packed-refs\" -github.com",
+    "filetype:git inurl:\"hooks\" -github.com",
+    "filetype:git inurl:\"info\" -github.com",
+    "filetype:gitweb inurl:git",
+    "filetype:git \"NOTICE OR LICENSE\"",
+    "filetype:git \"This file is a placeholder for the README file\"",
+    "filetype:git \"This file should contain a short description of the repository.\"",
+    "filetype:git \"This file is used to list changes made in each version of the project.\"",
+    "filetype:git \"This file contains important notes for the release.\"",
+    "filetype:git \"This file is part of the git package.\"",
+    "filetype:git \"This file contains release notes for the changes in each release.\"",
+    "filetype:git \"password\""
+   ]
+  },
+  {
+   "category": "Network Devices",
+   "dorks": [
+    "intitle:\"RouterOS\" inurl:\"winbox\" -github.com",
+    "intitle:\"Ubiquiti\" intext:\"airOS\" -github.com",
+    "intitle:\"MikroTik\" intext:\"Webfig\" -github.com",
+    "intitle:\"Ubiquiti\" intext:\"Rocket M5\" -github.com",
+    "intitle:\"Ubiquiti\" intext:\"Rocket M2\" -github.com",
+    "intitle:\"Ubiquiti\" intext:\"RocketDish\" -github.com",
+    "intitle:\"Ubiquiti\" intext:\"NanoBeam\" -github.com",
+    "intitle:\"RouterOS\" inurl:/winbox",
+    "intitle:\"Ubiquiti\" intext:\"airOS\"",
+    "intitle:\"MikroTik\" intext:\"Webfig\"",
+    "intitle:\"MikroTik\" intext:\"Chimay Red\"",
+    "intitle:\"Ubiquiti\" intext:\"Rocket M5\"",
+    "intitle:\"Ubiquiti\" intext:\"Rocket M2\"",
+    "intitle:\"Ubiquiti\" intext:\"RocketDish\"",
+    "intitle:\"Ubiquiti\" intext:\"NanoBeam\"",
+    "intitle:\"Ubiquiti\" intext:\"NanoStation\"",
+    "intitle:\"Ubiquiti\" intext:\"PowerBeam\"",
+    "intitle:\"Ubiquiti\" intext:\"LiteBeam\"",
+    "intitle:\"Ubiquiti\" intext:\"ToughSwitch\"",
+    "intitle:\"Ubiquiti\" intext:\"EdgeRouter\"",
+    "intitle:\"Ubiquiti\" intext:\"EdgeMax\"",
+    "intitle:\"Router Login\" inurl:/login.htm"
+   ]
+  },
+  {
+   "category": "Apache Tomcat",
+   "dorks": [
+    "intitle:\"Apache Tomcat\" intext:\"Apache Tomcat\" -github.com",
+    "intitle:\"Tomcat Manager Application\" -github.com",
+    "intitle:\"Apache Tomcat/7.0.5\" intext:\"If you're seeing this, you've successfully installed Tomcat.\" -github.com",
+    "intitle:\"Tomcat Server Administration\" -github.com",
+    "intitle:\"Apache Tomcat\" intext:\"Apache Tomcat\"",
+    "intitle:\"Tomcat Manager Application\"",
+    "intitle:\"Tomcat Status\" \"Tomcat Web Application Manager\"",
+    "intitle:\"Apache Tomcat/7.0.5\" intext:\"If you're seeing this, you've successfully installed Tomcat.\"",
+    "intitle:\"Tomcat Server Administration\"",
+    "intitle:\"Tomcat Web Application Manager\"",
+    "intitle:\"Tomcat\" intext:\"Welcome to Tomcat\"",
+    "intitle:\"Apache Tomcat\" intext:\"Tomcat Server Administration\"",
+    "intitle:\"Apache Tomcat\" intext:\"Tomcat Web Application Manager\""
+   ]
+  },
+  {
+   "category": "Wordpress Installation Files",
+   "dorks": [
+    "filetype:log inurl:\"wp-content/install.php\" -github.com",
+    "filetype:log inurl:\"wp-content/upgrade-log.php\" -github.com",
+    "filetype:log inurl:wp-content/install.php",
+    "filetype:log inurl:wp-content/upgrade-log.php"
+   ]
+  },
+  {
+   "category": "AWS Access Keys",
+   "dorks": [
+    "filetype:pem intext:\"AWS_ACCESS_KEY_ID\" -github.com",
+    "filetype:pem intext:PRIVATE KEY"
+   ]
+  },
+  {
+   "category": "Webcams",
+   "dorks": [
+    "inurl:/view.shtml",
+    "intitle:\"Live View / - AXIS\"",
+    "intitle:\"Live View / - AXIS 206M\"",
+    "inurl:/control/userimage.html",
+    "intitle:\"Toshiba Network Camera\" user login",
+    "intitle:\"i-Catcher Console - Web Monitor\"",
+    "intitle:\"Live NetSnap Cam-Server feed\"",
+    "inurl:\"/axis-cgi/mjpg\"",
+    "intitle:\"Live View / - AXIS 210\"",
+    "intitle:\"Live View / - AXIS 2400 Video Server\"",
+    "inurl:/view/index.shtml",
+    "intitle:\"Live View / - AXIS 240\"",
+    "inurl:/mjpg/video.mjpg",
+    "intitle:\"Live View / - AXIS 206W\"",
+    "inurl:/axis-cgi/jpg"
+   ]
+  },
+  {
+   "category": "Vulnerable Servers",
+   "dorks": [
+    "intitle:\"Test Page for the Apache Web Server on Fedora Core\"",
+    "intitle:\"Apache Status\" \"Server Version: Apache\"",
+    "intitle:\"Index of\" \"CentOS\" \"Test Page\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (CentOS)\"",
+    "intitle:\"Test Page for the Nginx HTTP Server\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (Ubuntu)\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (Red Hat)\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (Fedora)\"",
+    "intitle:\"Welcome to nginx!\" \"Welcome to nginx on Debian!\""
+   ]
+  },
+  {
+   "category": "Sensitive Directories",
+   "dorks": [
+    "intitle:\"Index of /admin\"",
+    "intitle:\"Index of /backup\"",
+    "intitle:\"Index of /config\"",
+    "intitle:\"Index of /database\"",
+    "intitle:\"Index of /logs\"",
+    "intitle:\"Index of /password\"",
+    "intitle:\"Index of /private\"",
+    "intitle:\"Index of /secret\"",
+    "intitle:\"Index of /temp\"",
+    "intitle:\"Index of /upload\"",
+    "intitle:\"Index of /www\""
+   ]
+  },
+  {
+   "category": "Database Files",
+   "dorks": [
+    "filetype:sql intext:username password",
+    "filetype:sql \"insert into\" (pass|passwd|password)",
+    "filetype:sql \"values\" \"username\" \"password\"",
+    "filetype:sql \"VALUES\" \"username\" \"password\"",
+    "filetype:sql \"CREATE USER\" username identified by password",
+    "filetype:sql \"CREATE USER\" username identified by \"password\"",
+    "filetype:sql \"CREATE USER\" username identified by 'password'",
+    "filetype:sql \"CREATE USER\" username identified by PASSWORD",
+    "filetype:sql \"GRANT ALL PRIVILEGES\" ON database.* TO \"username\"@\"%\"",
+    "filetype:sql \"GRANT ALL PRIVILEGES\" ON database.* TO \"username\"@\"localhost\"",
+    "filetype:sql \"GRANT ALL PRIVILEGES\" ON *.* TO \"username\"@\"%\"",
+    "filetype:sql \"GRANT ALL PRIVILEGES\" ON *.* TO \"username\"@\"localhost\""
+   ]
+  },
+  {
+   "category": "Cross-Site Scripting (XSS) Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?param=<script>\"",
+    "inurl:\".aspx?param=<script>\"",
+    "inurl:\".jsp?param=<script>\"",
+    "inurl:\".cgi?param=<script>\"",
+    "inurl:\".js?param=<script>\"",
+    "inurl:\".html?param=<script>\"",
+    "inurl:/search?q=<script>alert(1)</script>",
+    "inurl:\"search.php?q=\"",
+    "inurl:\"browse.php?category=\"",
+    "inurl:\"search.php?query=\"",
+    "inurl:\"results.php?search=\"",
+    "inurl:\"view.php?name=\"",
+    "inurl:\"show.php?file=\"",
+    "inurl:\"details.php?item=\"",
+    "inurl:\"content.php?article=\"",
+    "inurl:\"profile.php?user=\""
+   ]
+  },
+  {
+   "category": "SQL Injection Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?id=\"",
+    "inurl:\".aspx?id=\"",
+    "inurl:\".jsp?id=\"",
+    "inurl:\".cgi?id=\"",
+    "inurl:\".pl?id=\"",
+    "inurl:\".cfm?id=\"",
+    "inurl:/search.php?q=",
+    "inurl:\"page.php?category=\"",
+    "inurl:\"product.php?category=\"",
+    "inurl:\"view.php?item=\"",
+    "inurl:\"gallery.php?album=\"",
+    "inurl:\"show.php?article=\"",
+    "inurl:\"display.php?content=\"",
+    "inurl:\"download.php?file=\"",
+    "inurl:\"article.php?title=\"",
+    "inurl:\"news.php?article=\""
+   ]
+  },
+  {
+   "category": "Remote Code Execution (RCE) Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?cmd=\"",
+    "inurl:\".aspx?cmd=\"",
+    "inurl:\".jsp?cmd=\"",
+    "inurl:\".cgi?cmd=\"",
+    "inurl:\".pl?cmd=\"",
+    "inurl:\".cfm?cmd=\"",
+    "inurl:\"upload.php?file=\"",
+    "inurl:\"upload.php?filename=\"",
+    "inurl:\"upload.php?path=\"",
+    "inurl:\"upload.php?directory=\"",
+    "inurl:\"upload.php?data=\"",
+    "inurl:\"upload.php?cmd=\"",
+    "inurl:\"upload.php?exec=\"",
+    "inurl:\"upload.php?command=\"",
+    "inurl:\"upload.php?payload=\"",
+    "inurl:\"upload.php?execute=\""
+   ]
+  },
+  {
+   "category": "Local File Inclusion (LFI) Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?file=\"",
+    "inurl:\".aspx?file=\"",
+    "inurl:\".jsp?file=\"",
+    "inurl:\".cgi?file=\"",
+    "inurl:\".pl?file=\"",
+    "inurl:\".cfm?file=\""
+   ]
+  },
+  {
+   "category": "Directory Traversal Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?dir=\"",
+    "inurl:\".aspx?dir=\"",
+    "inurl:\".jsp?dir=\"",
+    "inurl:\".cgi?dir=\"",
+    "inurl:\".pl?dir=\"",
+    "inurl:\".cfm?dir=\""
+   ]
+  },
+  {
+   "category": "Remote File Inclusion (RFI) Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?file=http://\"",
+    "inurl:\".aspx?file=http://\"",
+    "inurl:\".jsp?file=http://\"",
+    "inurl:\".cgi?file=http://\"",
+    "inurl:\".pl?file=http://\"",
+    "inurl:\".cfm?file=http://\""
+   ]
+  },
+  {
+   "category": "Information Disclosure Vulnerabilities",
+   "dorks": [
+    "inurl:\".php?file=info\"",
+    "inurl:\".aspx?file=info\"",
+    "inurl:\".jsp?file=info\"",
+    "inurl:\".cgi?file=info\"",
+    "inurl:\".pl?file=info\"",
+    "inurl:\".cfm?file=info\"",
+    "inurl:\"config.php\"",
+    "inurl:\"database.php\"",
+    "inurl:\"settings.php\"",
+    "inurl:\"secrets.php\"",
+    "inurl:\"credentials.php\"",
+    "inurl:\"connection.php\"",
+    "inurl:\"keys.php\"",
+    "inurl:\"passwords.php\"",
+    "inurl:\"api_key.php\"",
+    "inurl:\"access_log.txt\"",
+    "inurl:\"error_log.txt\""
+   ]
+  },
+  {
+   "category": "Server Misconfigurations",
+   "dorks": [
+    "intitle:\"Index of /private\" OR \"Index of /backup\" OR \"Index of /log\" OR \"Index of /logs\""
+   ]
+  },
+  {
+   "category": "Open Elasticsearch Instances",
+   "dorks": [
+    "intitle:\"Welcome to Elastic\"",
+    "intitle:\"ElasticSearch\" AND \"Cluster\" AND \"Summary\"",
+    "intitle:\"Kibana\" AND \"Elastic\" AND \"Console\"",
+    "inurl:\"9200/_cat/indices\""
+   ]
+  },
+  {
+   "category": "Open MongoDB Instances",
+   "dorks": [
+    "intitle:\"MongoDB Status\"",
+    "intitle:\"Mongodb Server Status\"",
+    "inurl:\"27017\""
+   ]
+  },
+  {
+   "category": "Exposed Git Repositories",
+   "dorks": [
+    "intitle:\"Index of /.git\"",
+    "filetype:git \"Repository\"",
+    "filetype:git \"Index of /\"",
+    "filetype:git inurl:/.git"
+   ]
+  },
+  {
+   "category": "Exposed Jenkins Instances",
+   "dorks": [
+    "intitle:\"Dashboard [Jenkins]\"",
+    "intitle:\"Dashboard [Hudson]\""
+   ]
+  },
+  {
+   "category": "Exposed Grafana Instances",
+   "dorks": [
+    "intitle:\"Grafana\" inurl:/login",
+    "intitle:\"Grafana - Sign In\" inurl:/login"
+   ]
+  },
+  {
+   "category": "Exposed Jenkins Files",
+   "dorks": [
+    "filetype:xml inurl:jenkins"
+   ]
+  },
+  {
+   "category": "Exposed SonarQube Instances",
+   "dorks": [
+    "intitle:\"SonarQube\" inurl:/dashboard"
+   ]
+  },
+  {
+   "category": "Exposed Atlassian Confluence Instances",
+   "dorks": [
+    "intitle:\"Confluence\" AND \"Log In\""
+   ]
+  },
+  {
+   "category": "Exposed Atlassian JIRA Instances",
+   "dorks": [
+    "intitle:\"JIRA\" AND \"Log In\""
+   ]
+  },
+  {
+   "category": "Exposed Atlassian Bamboo Instances",
+   "dorks": [
+    "intitle:\"Bamboo\" AND \"Log in\""
+   ]
+  },
+  {
+   "category": "Exposed Atlassian Bitbucket Instances",
+   "dorks": [
+    "intitle:\"Bitbucket\" AND \"Log in\""
+   ]
+  },
+  {
+   "category": "Exposed Jenkins Groovy Scripts",
+   "dorks": [
+    "filetype:groovy \"Jenkins-CLI\""
+   ]
+  },
+  {
+   "category": "Exposed Jenkins Backup Files",
+   "dorks": [
+    "filetype:zip OR filetype:tar.gz OR filetype:tar inurl:jenkins AND inurl:backup"
+   ]
+  },
+  {
+   "category": "Exposed Database Backup Files",
+   "dorks": [
+    "filetype:sql inurl:backup"
+   ]
+  },
+  {
+   "category": "Exposed GitLab Instances",
+   "dorks": [
+    "intitle:\"GitLab\" AND \"Sign in\""
+   ]
+  },
+  {
+   "category": "Exposed Nexus Repository Manager Instances",
+   "dorks": [
+    "intitle:\"Nexus Repository Manager\""
+   ]
+  },
+  {
+   "category": "Exposed Artifactory Instances",
+   "dorks": [
+    "intitle:\"Artifactory Repository\""
+   ]
+  },
+  {
+   "category": "CCTV Systems",
+   "dorks": [
+    "intitle:\"DVR Login\" inurl:/login.htm",
+    "intitle:\"DVR User Login\" inurl:/login.htm",
+    "intitle:\"DVR User Login\" inurl:/logon.htm",
+    "intitle:\"DVR User Login\" inurl:/login.html",
+    "intitle:\"DVR User Login\" inurl:/logon.html",
+    "intitle:\"DVR User Login\" inurl:/login.asp",
+    "intitle:\"DVR User Login\" inurl:/logon.asp",
+    "intitle:\"DVR User Login\" inurl:/login.aspx",
+    "intitle:\"DVR User Login\" inurl:/logon.aspx"
+   ]
+  },
+  {
+   "category": "Error Messages",
+   "dorks": [
+    "intext:\"Error 404: Not Found\"",
+    "intext:\"Error 403: Forbidden\"",
+    "intext:\"Error 500: Internal Server Error\"",
+    "intext:\"Error 502: Bad Gateway\"",
+    "intext:\"Error 503: Service Unavailable\"",
+    "intext:\"Error 504: Gateway Timeout\"",
+    "intext:\"Error 505: HTTP Version Not Supported\"",
+    "intext:\"Error 506: Variant Also Negotiates\"",
+    "intext:\"Error 507: Insufficient Storage\"",
+    "intext:\"Error 508: Loop Detected\"",
+    "intext:\"Error 509: Bandwidth Limit Exceeded\"",
+    "intext:\"Error 510: Not Extended\"",
+    "intext:\"Error 511: Network Authentication Required\"",
+    "intext:\"Error 520: Unknown Error\"",
+    "intext:\"Error 521: Web Server Is Down\"",
+    "intext:\"Error 522: Connection Timed Out\"",
+    "intext:\"Error 523: Origin Is Unreachable\"",
+    "intext:\"Error 524: A Timeout Occurred\"",
+    "intext:\"Error 525: SSL Handshake Failed\"",
+    "intext:\"Error 526: Invalid SSL Certificate\"",
+    "intext:\"Error 527: Railgun Error\"",
+    "intext:\"Error 529: Site is overloaded\"",
+    "intext:\"Error 530: Site is frozen\"",
+    "intext:\"Error 503: Backend is unhealthy\"",
+    "intext:\"Error 530: Origin DNS Error\"",
+    "intext:\"Error Message\" ext:log"
+   ]
+  },
+  {
+   "category": "Zero Vuln",
+   "dorks": [
+    "inurl:\"/.well-known/security.txt\"",
+    "inurl:\"/.well-known/security\"",
+    "inurl:\"/.git/HEAD\"",
+    "inurl:\"/.git/config\"",
+    "inurl:\"/.git/COMMIT_EDITMSG\"",
+    "inurl:\"/.git/description\"",
+    "inurl:\"/.git/hooks\"",
+    "inurl:\"/.git/index\"",
+    "inurl:\"/.git/refs\"",
+    "inurl:\"/.env\"",
+    "inurl:\"/.vscode/settings.json\"",
+    "inurl:\"/.vscode/extensions.json\"",
+    "inurl:\"/cgi-bin/config.bin\"",
+    "inurl:\"/cgi-bin/login.bin\"",
+    "inurl:\"/cgi-bin/param.bin\"",
+    "inurl:\"/cgi-bin/webcm\"",
+    "inurl:\"/cgi-bin/wpa.cgi\"",
+    "inurl:\"/cgi-bin/handler\"",
+    "inurl:\"/cgi-bin/status\"",
+    "inurl:\"/cgi-bin/Network\"",
+    "inurl:\"/cgi-bin/admin\"",
+    "inurl:\"/cgi-bin/testcgi\"",
+    "inurl:\"/cgi-bin/test-cgi\"",
+    "inurl:\"/cgi-bin/test\"",
+    "inurl:\"/cgi-bin/php\"",
+    "inurl:\"/cgi-bin/php5\"",
+    "inurl:\"/cgi-bin/php4\"",
+    "inurl:\"/cgi-bin/phpinfo\"",
+    "inurl:\"/cgi-bin/phpinfo.php\"",
+    "inurl:\"/cgi-bin/phptest.cgi\"",
+    "inurl:\"/cgi-bin/test.cgi\"",
+    "inurl:\"/cgi-bin/admin.cgi\"",
+    "inurl:\"/cgi-bin/admin.pl\"",
+    "inurl:\"/cgi-bin/test.pl\"",
+    "inurl:\"/cgi-bin/test.sh\"",
+    "inurl:\"/cgi-bin/webmail.cgi\"",
+    "inurl:\"/cgi-bin/php.ini\"",
+    "inurl:\"/cgi-bin/.htaccess\"",
+    "inurl:\"/cgi-bin/db.cgi\"",
+    "inurl:\"/cgi-bin/db.pl\"",
+    "inurl:\"/cgi-bin/sql.cgi\"",
+    "inurl:\"/cgi-bin/sqlite.cgi\"",
+    "inurl:\"/cgi-bin/db.php\"",
+    "inurl:\"/cgi-bin/db2.cgi\"",
+    "inurl:\"/cgi-bin/dbtest.cgi\"",
+    "inurl:\"/cgi-bin/dbsql.cgi\"",
+    "inurl:\"/cgi-bin/dbsql.pl\"",
+    "inurl:\"/cgi-bin/mysql.cgi\"",
+    "inurl:\"/cgi-bin/mysql.pl\"",
+    "inurl:\"/cgi-bin/mysqlmanager.cgi\"",
+    "inurl:\"/cgi-bin/mysqlmanager.pl\"",
+    "inurl:\"/cgi-bin/mydb.cgi\"",
+    "inurl:\"/cgi-bin/oracle.cgi\"",
+    "inurl:\"/cgi-bin/dbconnect.cgi\"",
+    "inurl:\"/cgi-bin/mysqldb.cgi\"",
+    "inurl:\"/cgi-bin/websql.cgi\"",
+    "inurl:\"/cgi-bin/webdb.cgi\"",
+    "inurl:\"/cgi-bin/webdb2.cgi\"",
+    "inurl:\"/cgi-bin/webdbtest.cgi\"",
+    "inurl:\"/cgi-bin/acsscheduler.cgi\"",
+    "inurl:\"/cgi-bin/sqwebmail\"",
+    "inurl:\"/cgi-bin/w3-msql\"",
+    "inurl:\"/cgi-bin/dataweb\"",
+    "inurl:\"/cgi-bin/jam.pl\"",
+    "inurl:\"/cgi-bin/jamcgi\"",
+    "inurl:\"/cgi-bin/jamweb.cgi\"",
+    "inurl:\"/cgi-bin/jamtest.cgi\"",
+    "inurl:\"/cgi-bin/jamsql.cgi\"",
+    "inurl:\"/cgi-bin/sqldata\"",
+    "inurl:\"/cgi-bin/sqldb\"",
+    "inurl:\"/cgi-bin/sqlweb\"",
+    "inurl:\"/cgi-bin/sqlcgi\"",
+    "inurl:\"/cgi-bin/sqltest\"",
+    "inurl:\"/cgi-bin/sqlshell\"",
+    "inurl:\"/cgi-bin/sqlsh\"",
+    "inurl:\"/cgi-bin/lsdb\"",
+    "inurl:\"/cgi-bin/lsdb2\"",
+    "inurl:\"/cgi-bin/xsql\"",
+    "inurl:\"/cgi-bin/xsql2\"",
+    "inurl:\"/cgi-bin/webcgi\"",
+    "inurl:\"/cgi-bin/pagelog.cgi\"",
+    "inurl:\"/cgi-bin/getlog.cgi\"",
+    "inurl:\"/cgi-bin/testlog.cgi\"",
+    "inurl:\"/cgi-bin/logs.cgi\"",
+    "inurl:\"/cgi-bin/weblogs\"",
+    "inurl:\"/cgi-bin/testlogs\""
+   ]
+  },
+  {
+   "category": "Wordpress Sites",
+   "dorks": [
+    "inurl:/wp-admin",
+    "inurl:/wp-login",
+    "inurl:/wp-content",
+    "inurl:/wp-includes",
+    "inurl:/xmlrpc.php",
+    "inurl:/readme.html",
+    "inurl:/license.txt",
+    "inurl:/wp-json",
+    "inurl:/wp-trackback",
+    "inurl:/wp-xmlrpc",
+    "inurl:/wp-links-opml",
+    "inurl:/wp-comments-post",
+    "inurl:/wp-feed",
+    "inurl:/wp-mail",
+    "inurl:/wp-rss",
+    "inurl:/wp-tag",
+    "inurl:/wp-embed",
+    "inurl:/wp-login.php?action=register"
+   ]
+  },
+  {
+   "category": "FTP Servers",
+   "dorks": [
+    "intitle:\"FTP root at\"",
+    "intitle:\"FTP Server\" inurl:/ftp",
+    "intitle:\"Index of /ftp\"",
+    "intitle:\"Index of /\" \"FTP root\"",
+    "intitle:\"Index of /\" inurl:/ftp"
+   ]
+  },
+  {
+   "category": "Configuration Files",
+   "dorks": [
+    "filetype:conf inurl:web.config",
+    "filetype:conf inurl:httpd.conf",
+    "filetype:conf inurl:php.ini",
+    "filetype:conf inurl:my.cnf",
+    "filetype:conf inurl:config.inc.php",
+    "filetype:conf inurl:config.php",
+    "filetype:conf inurl:settings.php",
+    "filetype:conf inurl:application.properties",
+    "filetype:conf inurl:application.yml",
+    "filetype:conf inurl:database.yml",
+    "filetype:conf inurl:connectionStrings.config",
+    "filetype:conf inurl:settings.xml",
+    "filetype:conf inurl:connections.xml",
+    "filetype:env intext:AWS_SECRET_ACCESS_KEY",
+    "filetype:ini \"database\""
+   ]
+  },
+  {
+   "category": "PHP Info Files",
+   "dorks": [
+    "filetype:php inurl:info",
+    "filetype:php inurl:phpinfo"
+   ]
+  },
+  {
+   "category": "WordPress Configuration Files",
+   "dorks": [
+    "filetype:txt inurl:wp-config",
+    "filetype:json \"wordpress\""
+   ]
+  },
+  {
+   "category": "WordPress Backup Files",
+   "dorks": [
+    "filetype:sql \"WordPress\" \"backup\"",
+    "filetype:zip \"wp-content\""
+   ]
+  },
+  {
+   "category": "Error Logs",
+   "dorks": [
+    "filetype:log \"PHP Fatal error\" OR \"PHP Parse error\" OR \"PHP Warning\" OR \"PHP Error\""
+   ]
+  },
+  {
+   "category": "Login Credentials",
+   "dorks": [
+    "filetype:log \"login\" \"password\"",
+    "filetype:log \"username\" \"password\"",
+    "filetype:log \"user\" \"pass\""
+   ]
+  },
+  {
+   "category": "Google Drive Links",
+   "dorks": [
+    "inurl:\"/uc?id=\""
+   ]
+  },
+  {
+   "category": "Apache Access Logs",
+   "dorks": [
+    "filetype:log inurl:apache.log"
+   ]
+  },
+  {
+   "category": "Nginx Access Logs",
+   "dorks": [
+    "filetype:log inurl:nginx.log"
+   ]
+  },
+  {
+   "category": "Exposed Sensitive Files",
+   "dorks": [
+    "filetype:doc OR filetype:docx OR filetype:xls OR filetype:xlsx OR filetype:ppt OR filetype:pptx",
+    "intitle:\"Index of\" (doc|docx|xls|xlsx|ppt|pptx)"
+   ]
+  },
+  {
+   "category": "Exposed Credentials",
+   "dorks": [
+    "filetype:txt \"username\" AND \"password\"",
+    "filetype:txt \"user\" AND \"pass\"",
+    "filetype:log \"login: *\" AND \"password: *\""
+   ]
+  },
+  {
+   "category": "Network Devices (Specific Brands)",
+   "dorks": [
+    "intitle:\"Ubiquiti\" intext:\"EdgeRouter\"",
+    "intitle:\"Ubiquiti\" intext:\"EdgeMax\"",
+    "intitle:\"Ubiquiti\" intext:\"UniFi Controller\"",
+    "intitle:\"MikroTik\" intext:\"RouterOS\""
+   ]
+  },
+  {
+   "category": "Directory Listings",
+   "dorks": [
+    "intitle:\"Index of /\" \"Parent Directory\"",
+    "intitle:\"Index of /\" \"Last modified\"",
+    "intitle:\"Index of /\" \"Name\"",
+    "intitle:\"Index of /\" \"Size\"",
+    "intitle:\"Index of /\" \"Description\"",
+    "intitle:\"Index of /\" \"Modified\"",
+    "intitle:\"Index of /\" \"Windows 2003 Server\"",
+    "intitle:\"Index of /\" + \"admin\"",
+    "intitle:\"Index of /\" + \"backup\"",
+    "intitle:\"Index of /\" + \"logs\"",
+    "intitle:\"Index of /\" + \"config\"",
+    "intitle:\"Index of /\" + \"database\"",
+    "intitle:\"Index of /\" + \"passwd\"",
+    "intitle:\"Index of /\" + \"phpmyadmin\"",
+    "intitle:\"Index of /\" + \"wp-admin\"",
+    "intitle:\"Index of /\" + \"wp-content\"",
+    "intitle:\"Index of /\" + \"wp-includes\"",
+    "intitle:\"Index of /\" + \"uploads\""
+   ]
+  },
+  {
+   "category": "Open Redirect Vulnerabilities (Specific URLs)",
+   "dorks": [
+    "inurl:\"redirect?to=\"",
+    "inurl:\"out?to=\"",
+    "inurl:\"go?to=\"",
+    "inurl:\"to?url=\"",
+    "inurl:\"link?to=\"",
+    "inurl:\"url?url=\"",
+    "inurl:\"redir?url=\""
+   ]
+  },
+  {
+   "category": "MongoDB Databases",
+   "dorks": [
+    "inurl:/mongodb/port"
+   ]
+  },
+  {
+   "category": "MySQL Databases",
+   "dorks": [
+    "intext:\"-- phpMyAdmin SQL Dump\""
+   ]
+  },
+  {
+   "category": "PostgreSQL Databases",
+   "dorks": [
+    "intext:\"-- PostgreSQL database dump\""
+   ]
+  },
+  {
+   "category": "Oracle Databases",
+   "dorks": [
+    "intext:\"-- Oracle SQL Dump\""
+   ]
+  },
+  {
+   "category": "Microsoft SQL Server Databases",
+   "dorks": [
+    "intext:\"-- Dumping data for table\""
+   ]
+  },
+  {
+   "category": "FTP Servers (Specific Brands)",
+   "dorks": [
+    "intitle:\"FileZilla Server\""
+   ]
+  },
+  {
+   "category": "Open Redis Instances",
+   "dorks": [
+    "inurl:\"6379\""
+   ]
+  },
+  {
+   "category": "Open Memcached Instances",
+   "dorks": [
+    "inurl:\"11211\""
+   ]
+  },
+  {
+   "category": "Open VNC Instances",
+   "dorks": [
+    "inurl:\"5800\" OR inurl:\"5900\""
+   ]
+  },
+  {
+   "category": "Open RDP Instances",
+   "dorks": [
+    "inurl:\"3389\""
+   ]
+  },
+  {
+   "category": "Open Telnet Instances",
+   "dorks": [
+    "inurl:\"23\""
+   ]
+  },
+  {
+   "category": "Open SNMP Instances",
+   "dorks": [
+    "inurl:\"161\""
+   ]
+  },
+  {
+   "category": "Open MySQL Instances",
+   "dorks": [
+    "inurl:\"3306\""
+   ]
+  },
+  {
+   "category": "Open PostgreSQL Instances",
+   "dorks": [
+    "inurl:\"5432\""
+   ]
+  },
+  {
+   "category": "Open Rsync Instances",
+   "dorks": [
+    "inurl:\"873\""
+   ]
+  },
+  {
+   "category": "Open ElasticSearch Instances",
+   "dorks": [
+    "inurl:\"9200\""
+   ]
+  },
+  {
+   "category": "Open Jenkins Instances",
+   "dorks": [
+    "intext:\"Dashboard [Jenkins]\""
+   ]
+  },
+  {
+   "category": "Sensitive Information in Configuration Files",
+   "dorks": [
+    "filetype:env \"MAIL_USERNAME\"",
+    "filetype:env \"MAIL_PASSWORD\"",
+    "filetype:env \"DB_USERNAME\"",
+    "filetype:env \"DB_PASSWORD\"",
+    "filetype:env \"SECRET_KEY\""
+   ]
+  },
+  {
+   "category": "Wordpress wp-config Backup Files",
+   "dorks": [
+    "filetype:sql \"wp-config\" \"Backup\""
+   ]
+  },
+  {
+   "category": "Wordpress Configuration Backup Files",
+   "dorks": [
+    "filetype:zip \"wp-content\" \"backup\"",
+    "filetype:sql inurl:wp-config.bak",
+    "filetype:sql inurl:wp-config.php.bak"
+   ]
+  },
+  {
+   "category": "Wordpress Plugins with Vulnerabilities",
+   "dorks": [
+    "inurl:/wp-content/plugins/ \"index of /\""
+   ]
+  },
+  {
+   "category": "Joomla Configuration Files",
+   "dorks": [
+    "filetype:txt inurl:configuration.php"
+   ]
+  },
+  {
+   "category": "Subdomains",
+   "dorks": [
+    "site:*.example.com",
+    "site:*.example.net",
+    "site:*.example.org"
+   ]
+  },
+  {
+   "category": "Secure Shell (SSH) Keys",
+   "dorks": [
+    "filetype:key inurl:ssh"
+   ]
+  },
+  {
+   "category": "FTP Login Credentials",
+   "dorks": [
+    "filetype:ini \"FTP\" \"password\"",
+    "filetype:ini \"FTP\" \"username\""
+   ]
+  },
+  {
+   "category": "Password Files",
+   "dorks": [
+    "filetype:txt \"password\""
+   ]
+  },
+  {
+   "category": "Vulnerable CMS (Content Management Systems)",
+   "dorks": [
+    "intitle:\"Powered by WordPress\"",
+    "intitle:\"Powered by Joomla\"",
+    "intitle:\"Powered by Drupal\"",
+    "intitle:\"Powered by Magento\"",
+    "intitle:\"Powered by vBulletin\"",
+    "intitle:\"Powered by phpBB\"",
+    "intitle:\"Powered by MediaWiki\"",
+    "intitle:\"Powered by ExpressionEngine\"",
+    "intitle:\"Powered by Blogger\"",
+    "intitle:\"Powered by TYPO3\""
+   ]
+  },
+  {
+   "category": "Online Devices",
+   "dorks": [
+    "inurl:/camera/view",
+    "inurl:/view.shtml",
+    "inurl:/view/index.shtml",
+    "inurl:/axis-cgi/mjpg",
+    "inurl:/control/userimage.html",
+    "inurl:/control/faststream.htm",
+    "inurl:/index/blink.cgi"
+   ]
+  },
+  {
+   "category": "Log Files",
+   "dorks": [
+    "filetype:log \"access.log\""
+   ]
+  },
+  {
+   "category": "Exposed API Keys",
+   "dorks": [
+    "filetype:json \"api_key\"",
+    "filetype:json \"api_secret_key\"",
+    "filetype:json \"api_access_key\"",
+    "filetype:json \"api_token\""
+   ]
+  },
+  {
+   "category": "Server Configurations",
+   "dorks": [
+    "filetype:conf inurl:apache2.conf",
+    "filetype:conf inurl:httpd.conf",
+    "filetype:conf inurl:nginx.conf"
+   ]
+  },
+  {
+   "category": "PHP Information",
+   "dorks": [
+    "intitle:\"PHP Version\" inurl:/info.php"
+   ]
+  },
+  {
+   "category": "Proxy Servers",
+   "dorks": [
+    "intitle:\"Proxy Lists\""
+   ]
+  },
+  {
+   "category": "Printer Configurations",
+   "dorks": [
+    "inurl:printer/config"
+   ]
+  },
+  {
+   "category": "Docker Registry Credentials",
+   "dorks": [
+    "filetype:json \"auths\""
+   ]
+  },
+  {
+   "category": "Database Backup Files",
+   "dorks": [
+    "filetype:sql \"MySQL dump\"",
+    "intext:\"-- Database: \" filetype:sql",
+    "intext:\"-- Dumping data for table\" filetype:sql",
+    "intext:\"-- Table structure for table\" filetype:sql",
+    "intext:\"INSERT INTO\" filetype:sql",
+    "intext:\"DROP TABLE\" filetype:sql",
+    "intext:\"CREATE TABLE\" filetype:sql"
+   ]
+  },
+  {
+   "category": "Unsecured Webcams",
+   "dorks": [
+    "intitle:\"Live WebCam\" inurl:/index.html"
+   ]
+  },
+  {
+   "category": "Jira Configuration Files",
+   "dorks": [
+    "filetype:xml \"Jira\" \"backup\""
+   ]
+  },
+  {
+   "category": "Exposed AWS Credentials",
+   "dorks": [
+    "filetype:json \"AWS_ACCESS_KEY\""
+   ]
+  },
+  {
+   "category": "Git Repository Configuration Files",
+   "dorks": [
+    "filetype:git \"config\""
+   ]
+  },
+  {
+   "category": "Sensitive Information in Code",
+   "dorks": [
+    "filetype:sql \"password\" \"CREATE USER\""
+   ]
+  },
+  {
+   "category": "Network Device Configurations",
+   "dorks": [
+    "filetype:xml \"config\""
+   ]
+  },
+  {
+   "category": "Openstack API Endpoints",
+   "dorks": [
+    "intitle:\"Openstack Dashboard\""
+   ]
+  },
+  {
+   "category": "SharePoint Configuration Files",
+   "dorks": [
+    "filetype:xml \"Configuration\""
+   ]
+  },
+  {
+   "category": "Sensitive Information in JavaScript Files",
+   "dorks": [
+    "filetype:js \"password\""
+   ]
+  },
+  {
+   "category": "MongoDB Configuration Files",
+   "dorks": [
+    "filetype:yaml \"mongodb\"",
+    "filetype:conf inurl:mongodb.conf",
+    "filetype:conf inurl:mongo.conf",
+    "filetype:conf inurl:mongod.conf",
+    "filetype:conf inurl:mongos.conf"
+   ]
+  },
+  {
+   "category": "Jenkins Configuration Files",
+   "dorks": [
+    "filetype:xml \"jenkins\"",
+    "filetype:xml inurl:jenkins.xml",
+    "filetype:xml inurl:config.xml",
+    "filetype:xml inurl:credentials.xml",
+    "filetype:xml inurl:hudson.util.Secret"
+   ]
+  },
+  {
+   "category": "Wordpress Backup Files",
+   "dorks": [
+    "filetype:zip \"wp-content\""
+   ]
+  },
+  {
+   "category": "WordPress Configuration Backups",
+   "dorks": [
+    "filetype:json \"wp-config\""
+   ]
+  },
+  {
+   "category": "Sensitive Information in XML Files",
+   "dorks": [
+    "filetype:xml \"password\""
+   ]
+  },
+  {
+   "category": "API Keys",
+   "dorks": [
+    "filetype:env intext:API_KEY"
+   ]
+  },
+  {
+   "category": "Configuration Files (Apache)",
+   "dorks": [
+    "filetype:conf inurl:apache2.conf",
+    "filetype:conf inurl:httpd.conf"
+   ]
+  },
+  {
+   "category": "Configuration Files (Nginx)",
+   "dorks": [
+    "filetype:conf inurl:nginx.conf"
+   ]
+  },
+  {
+   "category": "JSON Configuration Files",
+   "dorks": [
+    "filetype:json inurl:config.json",
+    "filetype:json inurl:settings.json",
+    "filetype:json inurl:configuration.json",
+    "filetype:json inurl:credentials.json",
+    "filetype:json inurl:keys.json",
+    "filetype:json inurl:secrets.json",
+    "filetype:json inurl:auth.json"
+   ]
+  },
+  {
+   "category": "Log Files (Custom)",
+   "dorks": [
+    "filetype:log inurl:logs/access.log",
+    "filetype:log inurl:logs/error.log"
+   ]
+  },
+  {
+   "category": "Backup Files (Custom)",
+   "dorks": [
+    "filetype:bkf OR filetype:bkp OR filetype:bak OR filetype:old OR filetype:backup"
+   ]
+  },
+  {
+   "category": "Docker Configuration Files",
+   "dorks": [
+    "filetype:json OR filetype:yaml OR filetype:yml \"Dockerfile\""
+   ]
+  },
+  {
+   "category": "Excel Spreadsheets (Containing Sensitive Information)",
+   "dorks": [
+    "filetype:xls \"password\"",
+    "filetype:xls \"login\"",
+    "filetype:xls \"credentials\""
+   ]
+  },
+  {
+   "category": "Wordpress Backups",
+   "dorks": [
+    "filetype:zip inurl:wp-content/backup",
+    "filetype:tar inurl:wp-content/backup",
+    "filetype:rar inurl:wp-content/backup"
+   ]
+  },
+  {
+   "category": "Redis Configuration Files",
+   "dorks": [
+    "filetype:conf inurl:redis.conf",
+    "filetype:conf inurl:redis.conf.default",
+    "filetype:conf inurl:redis.conf.bak"
+   ]
+  },
+  {
+   "category": "Elasticsearch Configuration Files",
+   "dorks": [
+    "filetype:yaml inurl:elasticsearch.yml",
+    "filetype:yaml inurl:elasticsearch.yaml",
+    "filetype:yaml inurl:elasticsearch.yml.bak",
+    "filetype:yaml inurl:elasticsearch.yaml.bak"
+   ]
+  },
+  {
+   "category": "Jupyter Notebook Configuration Files",
+   "dorks": [
+    "filetype:json inurl:jupyter_notebook_config.json",
+    "filetype:json inurl:jupyterhub_config.json"
+   ]
+  },
+  {
+   "category": "Django Settings Files",
+   "dorks": [
+    "filetype:py inurl:settings.py"
+   ]
+  },
+  {
+   "category": "Laravel Configuration Files",
+   "dorks": [
+    "filetype:env inurl:.env"
+   ]
+  },
+  {
+   "category": "GitLab Configuration Files",
+   "dorks": [
+    "filetype:yaml OR filetype:yml inurl:gitlab-ci.yml",
+    "filetype:json inurl:gitlab-secrets.json"
+   ]
+  },
+  {
+   "category": "SVN Configuration Files",
+   "dorks": [
+    "filetype:conf inurl:svnserve.conf",
+    "filetype:conf inurl:svnauthz"
+   ]
+  },
+  {
+   "category": "Mercurial Configuration Files",
+   "dorks": [
+    "filetype:conf inurl:hgrc"
+   ]
+  },
+  {
+   "category": "Apache Hive Configuration Files",
+   "dorks": [
+    "filetype:xml inurl:hive-site.xml"
+   ]
+  },
+  {
+   "category": "Apache Cassandra Configuration Files",
+   "dorks": [
+    "filetype:yaml inurl:cassandra.yaml",
+    "filetype:yaml inurl:cassandra-env.sh"
+   ]
+  },
+  {
+   "category": "API Keys (Custom)",
+   "dorks": [
+    "inurl:\"apikey\" OR inurl:\"api-key\" OR inurl:\"api_key\""
+   ]
+  },
+  {
+   "category": "JWT Tokens (Custom)",
+   "dorks": [
+    "inurl:\"jwt_token\" OR inurl:\"jwt-token\""
+   ]
+  },
+  {
+   "category": "Elasticsearch Cluster Health",
+   "dorks": [
+    "inurl:\"_cat/health\""
+   ]
+  },
+  {
+   "category": "Elasticsearch Cluster Nodes",
+   "dorks": [
+    "inurl:\"_cat/nodes\""
+   ]
+  },
+  {
+   "category": "Elasticsearch Cluster Indices",
+   "dorks": [
+    "inurl:\"_cat/indices\""
+   ]
+  },
+  {
+   "category": "Redis Info Command",
+   "dorks": [
+    "inurl:\"/info\""
+   ]
+  },
+  {
+   "category": "Apache Solr Web Interface",
+   "dorks": [
+    "inurl:\"/solr\" OR inurl:\"/solr/admin\""
+   ]
+  },
+  {
+   "category": "Kubernetes Dashboard",
+   "dorks": [
+    "inurl:\"/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/\""
+   ]
+  },
+  {
+   "category": "phpMyAdmin (Custom)",
+   "dorks": [
+    "intitle:\"phpMyAdmin\" inurl:/index.php"
+   ]
+  },
+  {
+   "category": "OpenCV Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"OpenCV Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "Pi-hole Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"Pi-hole Admin Console\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "Minecraft Server Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"Minecraft Server Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "Linksys Router Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"Linksys Router Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "VPN Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"VPN Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "Firewall Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"Firewall Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "VoIP Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"VoIP Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "NAS Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"NAS Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "Router Admin Panel (Custom)",
+   "dorks": [
+    "intitle:\"Router Admin Panel\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "IoT Devices",
+   "dorks": [
+    "intitle:\"Network Camera\" inurl:/liveview",
+    "intitle:\"IP Camera Viewer\" inurl:/stream",
+    "intitle:\"Live Stream - powered by Tightrope Media Systems\"",
+    "intitle:\"Printer Status\" inurl:/printer",
+    "intitle:\"Printer Configuration\" inurl:/printer",
+    "intitle:\"Printer Management\" inurl:/printer"
+   ]
+  },
+  {
+   "category": "Network Printers",
+   "dorks": [
+    "intitle:\"Printer Configuration\" inurl:/ipp",
+    "intitle:\"Printer Status\" inurl:/ipp",
+    "intitle:\"Printer Management\" inurl:/ipp",
+    "intitle:\"CUPS\" intext:\"Printer configuration\" inurl:/admin"
+   ]
+  },
+  {
+   "category": "Security Cameras",
+   "dorks": [
+    "intitle:\"Security Camera Viewer\" inurl:/live",
+    "intitle:\"Surveillance Camera\" inurl:/view",
+    "intitle:\"Surveillance System\" inurl:/live-feed",
+    "intitle:\"Camera Live View\" inurl:/cam",
+    "intitle:\"Index of /credentials\"",
+    "intitle:\"Index of /database-backup\"",
+    "intitle:\"Index of /server-config\"",
+    "filetype:log \"Application Error\" OR \"Exception\" OR \"Fatal Error\"",
+    "filetype:log \"Access Denied\" OR \"Unauthorized\"",
+    "filetype:log \"SQL Error\" OR \"Database Error\"",
+    "filetype:log \"404 Not Found\" OR \"Page Not Found\"",
+    "filetype:log \"Stack Trace\" OR \"Traceback\"",
+    "filetype:env intext:\"API_KEY\"",
+    "filetype:env intext:\"SECRET_KEY\"",
+    "filetype:env intext:\"DATABASE_PASSWORD\"",
+    "filetype:env intext:\"ADMIN_PASSWORD\"",
+    "filetype:env intext:\"JWT_SECRET_KEY\"",
+    "filetype:zip OR filetype:tar.gz OR filetype:tar intext:\"/backup/\"",
+    "intitle:\"Welcome to phpMyAdmin\" AND \"Not Found\" AND \"Error 404\"",
+    "intitle:\"Index of /phpMyAdmin\" AND \"Forbidden\" AND \"Error 403\"",
+    "intitle:\"Apache2 Debian Default Page: It works\" AND \"Error 404\"",
+    "intitle:\"Apache HTTP Server Test Page powered by CentOS\" AND \"Error 404\"",
+    "intitle:\"NVR Login\" inurl:/login.htm",
+    "intitle:\"NVR User Login\" inurl:/login.htm",
+    "intitle:\"NVR User Login\" inurl:/logon.htm",
+    "intitle:\"NVR User Login\" inurl:/login.html",
+    "intitle:\"NVR User Login\" inurl:/logon.html",
+    "intitle:\"NVR User Login\" inurl:/login.asp",
+    "intitle:\"NVR User Login\" inurl:/logon.asp",
+    "intitle:\"NVR User Login\" inurl:/login.aspx",
+    "intitle:\"NVR User Login\" inurl:/logon.aspx",
+    "intitle:\"Index of /config-backup\"",
+    "intitle:\"Index of /uploads-private\"",
+    "intitle:\"Index of /logs-sensitive\""
+   ]
+  },
+  {
+   "category": "Vulnerable Installations",
+   "dorks": [
+    "intitle:\"Welcome to phpMyAdmin\" AND \"Not Found\" AND \"Error 404\"",
+    "intitle:\"Index of /phpMyAdmin\" AND \"Forbidden\" AND \"Error 403\"",
+    "intitle:\"Apache2 Debian Default Page: It works\" AND \"Error 404\"",
+    "intitle:\"Apache HTTP Server Test Page powered by CentOS\" AND \"Error 404\"",
+    "intitle:\"Apache2 Ubuntu Default Page: It works\" AND \"Error 404\"",
+    "intitle:\"Welcome to nginx!\" AND \"Error 404\"",
+    "intitle:\"Index of /\" \"Parent Directory\" \"Error 403\"",
+    "intitle:\"Index of /\" \"Parent Directory\" \"Error 404\"",
+    "intitle:\"Index of /\" \"Parent Directory\" \"Error 403\" \"Forbidden\"",
+    "intitle:\"Index of /\" \"Parent Directory\" \"Error 404\" \"Not Found\"",
+    "intitle:\"Test Page for the Apache HTTP Server\" \"It Worked!\"",
+    "intitle:\"Test Page for the Nginx HTTP Server\" \"Welcome to nginx!\"",
+    "intitle:\"Test Page for the Apache Web Server on Fedora\" \"Fedora Core Test Page\"",
+    "intitle:\"Apache Status\" \"Server Version: Apache\"",
+    "intitle:\"Test Page for the Apache HTTP Server on Fedora Core\"",
+    "intitle:\"Index of /\" \"CentOS\" \"Test Page\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (CentOS)\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (Ubuntu)\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (Red Hat)\"",
+    "intitle:\"Index of /\" \"Apache/2.2.3 (Fedora)\""
+   ]
+  },
+  {
+   "category": "Exposed AWS S3 Buckets",
+   "dorks": [
+    "inurl:s3.amazonaws.com"
+   ]
+  },
+  {
+   "category": "Magento Configuration Files",
+   "dorks": [
+    "filetype:xml inurl:app/etc/local.xml"
+   ]
+  },
+  {
+   "category": "Elasticsearch Exposed Instances",
+   "dorks": [
+    "intitle:\"Elasticsearch\" intext:\"You Know, for Search\""
+   ]
+  },
+  {
+   "category": "Jenkins Exposed Instances",
+   "dorks": [
+    "intitle:\"Dashboard [Jenkins]\" inurl:/view"
+   ]
+  },
+  {
+   "category": "Redis Unauthenticated Access",
+   "dorks": [
+    "intitle:\"Redis\" intext:\"Authentication required\""
+   ]
+  },
+  {
+   "category": "MongoDB Exposed Instances",
+   "dorks": [
+    "intitle:\"MongoDB\" intext:\"Error Page\""
+   ]
+  },
+  {
+   "category": "Open Web Application Security Project (OWASP)",
+   "dorks": [
+    "inurl:/owasp"
+   ]
+  },
+  {
+   "category": "Apache Tomcat Exposed Instances",
+   "dorks": [
+    "intitle:\"Apache Tomcat\" intext:\"Tomcat Web Application Manager\""
+   ]
+  },
+  {
+   "category": "Server Error Messages",
+   "dorks": [
+    "intitle:\"500 Internal Server Error\""
+   ]
+  },
+  {
+   "category": "Exposed API Endpoints",
+   "dorks": [
+    "inurl:/api/v1",
+    "inurl:/api/v2",
+    "inurl:/api/v3",
+    "inurl:/api/v1/*.*",
+    "inurl:/api/v2/*.*",
+    "inurl:/api/v3/*.*"
+   ]
+  },
+  {
+   "category": "Exposed PHPMyAdmin Instances",
+   "dorks": [
+    "intitle:\"phpMyAdmin\" \"Welcome to phpMyAdmin\""
+   ]
+  },
+  {
+   "category": "Exposed Jupyter Notebooks",
+   "dorks": [
+    "intitle:\"Jupyter Notebook\" inurl:/tree"
+   ]
+  },
+  {
+   "category": "Vulnerable Web Applications",
+   "dorks": [
+    "inurl:\"/vulnerable_app\""
+   ]
+  },
+  {
+   "category": "Unprotected Git Repositories",
+   "dorks": [
+    "intitle:\"Index of /.git\"",
+    "intitle:\"Index of /git\""
+   ]
+  },
+  {
+   "category": "Exposed Cloud Storage Buckets",
+   "dorks": [
+    "intitle:\"Index of /s3\"",
+    "intitle:\"Index of /s3bucket\""
+   ]
+  },
+  {
+   "category": "Exposed Backup Files",
+   "dorks": [
+    "filetype:bkf \"Microsoft Backup\"",
+    "filetype:bkp \"Backup\" OR \"Bak\" OR \"BKP\""
+   ]
+  },
+  {
+   "category": "Exposed Config Files",
+   "dorks": [
+    "filetype:ini \"password\"",
+    "filetype:conf \"password\"",
+    "filetype:cfg \"password\"",
+    "filetype:config \"password\""
+   ]
+  },
+  {
+   "category": "Exposed Database Backups",
+   "dorks": [
+    "filetype:sql \"database\"",
+    "filetype:sql \"backup\"",
+    "filetype:sql \"bak\""
+   ]
+  },
+  {
+   "category": "Exposed Credentials in Source Code",
+   "dorks": [
+    "intext:\"password\" AND \"public static final\"",
+    "intext:\"password\" AND \"private static final\"",
+    "intext:\"password\" AND \"public String\"",
+    "intext:\"password\" AND \"private String\""
+   ]
+  },
+  {
+   "category": "Exposed AWS Keys",
+   "dorks": [
+    "filetype:json \"aws_access_key\"",
+    "filetype:json \"aws_secret_access_key\""
+   ]
+  },
+  {
+   "category": "Exposed Security Certificates",
+   "dorks": [
+    "filetype:pfx \"Certificate\""
+   ]
+  },
+  {
+   "category": "Exposed Web Shell Scripts",
+   "dorks": [
+    "intext:\"eval($_POST['shell'])\""
+   ]
+  },
+  {
+   "category": "Exposed Configurations for CMS",
+   "dorks": [
+    "filetype:xml \"CMS Configuration\"",
+    "filetype:xml \"CMS Settings\""
+   ]
+  },
+  {
+   "category": "Exposed Network Devices Configurations",
+   "dorks": [
+    "intitle:\"Index of /backup\" AND (filetype:cfg OR filetype:conf OR filetype:backup OR filetype:bkp)"
+   ]
+  },
+  {
+   "category": "Exposed Printer Configuration Files",
+   "dorks": [
+    "intitle:\"Index of /ipp\" AND (filetype:conf OR filetype:config OR filetype:backup OR filetype:bkp)"
+   ]
+  },
+  {
+   "category": "Exposed Firewall Configuration Files",
+   "dorks": [
+    "intitle:\"Index of /fw\" AND (filetype:cfg OR filetype:conf OR filetype:backup OR filetype:bkp)"
+   ]
+  },
+  {
+   "category": "Exposed Security Camera Configuration Files",
+   "dorks": [
+    "intitle:\"Index of /cam-config\" AND (filetype:cfg OR filetype:conf OR filetype:backup OR filetype:bkp)"
+   ]
+  },
+  {
+   "category": "Exposed IoT Device Configuration Files",
+   "dorks": [
+    "intitle:\"Index of /iot\" AND (filetype:cfg OR filetype:conf OR filetype:backup OR filetype:bkp)"
+   ]
+  },
+  {
+   "category": "Exposed Network Switch Configuration Files",
+   "dorks": [
+    "intitle:\"Index of /switch-config\" AND (filetype:cfg OR filetype:conf OR filetype:backup OR filetype:bkp)"
+   ]
+  },
+  {
+   "category": "Exposed Subversion Repositories",
+   "dorks": [
+    "filetype:svn inurl:/viewvc"
+   ]
+  },
+  {
+   "category": "Exposed Mercurial Repositories",
+   "dorks": [
+    "filetype:hg inurl:.hg"
+   ]
+  },
+  {
+   "category": "Exposed CVS Repositories",
+   "dorks": [
+    "filetype:pserver inurl:/CVS"
+   ]
+  },
+  {
+   "category": "Exposed Visual Studio Code (VSCode) Settings",
+   "dorks": [
+    "filetype:code-workspace inurl:/.vscode"
+   ]
+  },
+  {
+   "category": "Exposed Development Environments",
+   "dorks": [
+    "intitle:\"Welcome to JBoss\" intext:\"Username\" intext:\"Password\""
+   ]
+  },
+  {
+   "category": "Exposed Jenkins Configuration",
+   "dorks": [
+    "intitle:\"Dashboard [Jenkins]\""
+   ]
+  },
+  {
+   "category": "Exposed Jenkins Server",
+   "dorks": [
+    "intitle:\"Welcome to Jenkins!\""
+   ]
+  },
+  {
+   "category": "Exposed Atlassian Jira",
+   "dorks": [
+    "intitle:\"Login - JIRA\" AND \"Powered by Atlassian JIRA\""
+   ]
+  },
+  {
+   "category": "Exposed Microsoft SQL Servers",
+   "dorks": [
+    "intitle:\"Microsoft SQL Server Web Administration\""
+   ]
+  },
+  {
+   "category": "Exposed Redis Servers",
+   "dorks": [
+    "intitle:\"Redis key-value store in production\" intext:\"redis_version\""
+   ]
+  },
+  {
+   "category": "Exposed MongoDB Instances",
+   "dorks": [
+    "intitle:\"MongoDB Status\" intext:\"MongoDB Server Status\""
+   ]
+  },
+  {
+   "category": "Exposed Elasticsearch Instances",
+   "dorks": [
+    "intitle:\"Elastic Cluster Overview\" intext:\"You Know, for Search\""
+   ]
+  },
+  {
+   "category": "Exposed Apache Solr Instances",
+   "dorks": [
+    "intitle:\"Welcome to Solr\" intext:\"Solr Admin\""
+   ]
+  },
+  {
+   "category": "Exposed RabbitMQ Instances",
+   "dorks": [
+    "intitle:\"RabbitMQ Management\" intext:\"RabbitMQ Management\""
+   ]
+  },
+  {
+   "category": "Exposed Kubernetes Dashboard",
+   "dorks": [
+    "intitle:\"Kubernetes Dashboard\""
+   ]
+  },
+  {
+   "category": "Exposed Grafana Dashboards",
+   "dorks": [
+    "intitle:\"Grafana -\" intext:\"Welcome to Grafana\""
+   ]
+  },
+  {
+   "category": "Exposed MongoDB Database Backups",
+   "dorks": [
+    "intitle:\"Index of /backup\" inurl:/mongodb"
+   ]
+  },
+  {
+   "category": "Exposed Elasticsearch Database Backups",
+   "dorks": [
+    "intitle:\"Index of /backup\" inurl:/elasticsearch"
+   ]
+  },
+  {
+   "category": "Exposed FTP Server Credentials",
+   "dorks": [
+    "filetype:ini \"Host\" AND \"Username\" AND \"Password\" AND \"Port\" inurl:ftp"
+   ]
+  },
+  {
+   "category": "Exposed SSH Private Keys",
+   "dorks": [
+    "filetype:key inurl:ssh"
+   ]
+  },
+  {
+   "category": "Exposed Database Configuration Files",
+   "dorks": [
+    "filetype:env OR filetype:ini OR filetype:cfg OR filetype:config inurl:/config/"
+   ]
+  },
+  {
+   "category": "Exposed WordPress Database Backup Files",
+   "dorks": [
+    "filetype:sql \"INSERT INTO\" \"VALUES\" \"WordPress\" inurl:/wp-content/"
+   ]
+  },
+  {
+   "category": "Exposed PHPMyAdmin Installations",
+   "dorks": [
+    "intitle:\"phpMyAdmin\" AND \"Welcome to phpMyAdmin\""
+   ]
+  },
+  {
+   "category": "Exposed Web Application Source Code",
+   "dorks": [
+    "filetype:php \"Index of /src/\" OR \"Index of /source/\" OR \"Index of /code/\""
+   ]
+  },
+  {
+   "category": "File Inclusion Vulnerabilities",
+   "dorks": [
+    "inurl:\"file.php?id=\"",
+    "inurl:\"page.php?id=\"",
+    "inurl:\"view.php?id=\"",
+    "inurl:\"content.php?id=\"",
+    "inurl:\"product.php?id=\"",
+    "inurl:\"gallery.php?id=\"",
+    "inurl:\"show.php?id=\"",
+    "inurl:\"display.php?id=\"",
+    "inurl:\"download.php?id=\"",
+    "inurl:\"article.php?id=\"",
+    "inurl:\"news.php?id=\""
+   ]
+  },
+  {
+   "category": "Cross-Site Request Forgery (CSRF) Vulnerabilities",
+   "dorks": [
+    "inurl:\"change_password.php?user=\"",
+    "inurl:\"update_profile.php?user=\"",
+    "inurl:\"update_settings.php?user=\"",
+    "inurl:\"update_info.php?user=\"",
+    "inurl:\"update_account.php?user=\"",
+    "inurl:\"update_data.php?user=\"",
+    "inurl:\"change_email.php?user=\"",
+    "inurl:\"modify_password.php?user=\"",
+    "inurl:\"modify_profile.php?user=\"",
+    "inurl:\"modify_settings.php?user=\""
+   ]
+  },
+  {
+   "category": "Authentication Bypass Vulnerabilities",
+   "dorks": [
+    "inurl:\"login.php?admin=true\"",
+    "inurl:\"admin.php?access=1\"",
+    "inurl:\"signin.php?admin=true\"",
+    "inurl:\"admin_login.php?root=true\"",
+    "inurl:\"dashboard.php?admin=true\"",
+    "inurl:\"authenticate.php?admin=true\"",
+    "inurl:\"access.php?admin=true\"",
+    "inurl:\"auth.php?admin=true\"",
+    "inurl:\"verify.php?admin=true\""
+   ]
+  },
+  {
+   "category": "Code Injection Vulnerabilities",
+   "dorks": [
+    "inurl:\"execute.php?code=\"",
+    "inurl:\"run.php?code=\"",
+    "inurl:\"eval.php?code=\"",
+    "inurl:\"execute_script.php?code=\"",
+    "inurl:\"eval_script.php?code=\"",
+    "inurl:\"run_script.php?code=\"",
+    "inurl:\"execute_code.php?code=\"",
+    "inurl:\"run_code.php?code=\"",
+    "inurl:\"eval_code.php?code=\""
+   ]
+  },
+  {
+   "category": "Command Injection Vulnerabilities",
+   "dorks": [
+    "inurl:\"run_command.php?cmd=\"",
+    "inurl:\"execute_command.php?cmd=\"",
+    "inurl:\"command.php?exec=\"",
+    "inurl:\"run_shell.php?cmd=\"",
+    "inurl:\"execute_shell.php?cmd=\"",
+    "inurl:\"shell.php?command=\"",
+    "inurl:\"run_cmd.php?cmd=\"",
+    "inurl:\"execute_cmd.php?cmd=\"",
+    "inurl:\"cmd.php?run=\""
+   ]
+  },
+  {
+   "category": "Cross-Site Script Inclusion (XSSI) Vulnerabilities",
+   "dorks": [
+    "inurl:\"load_script.php?name=\"",
+    "inurl:\"get_script.php?file=\"",
+    "inurl:\"include_script.php?src=\"",
+    "inurl:\"import_script.php?file=\"",
+    "inurl:\"load_js.php?name=\"",
+    "inurl:\"get_js.php?file=\"",
+    "inurl:\"include_js.php?src=\"",
+    "inurl:\"import_js.php?file=\""
+   ]
+  },
+  {
+   "category": "Server-Side Request Forgery (SSRF) Vulnerabilities",
+   "dorks": [
+    "inurl:\"proxy.php?url=\"",
+    "inurl:\"fetch.php?url=\"",
+    "inurl:\"request.php?url=\"",
+    "inurl:\"get_url.php?url=\"",
+    "inurl:\"open.php?url=\"",
+    "inurl:\"read.php?url=\"",
+    "inurl:\"load.php?url=\"",
+    "inurl:\"access.php?url=\"",
+    "inurl:\"download_url.php?url=\""
+   ]
+  },
+  {
+   "category": "Arbitrary File Upload Vulnerabilities",
+   "dorks": [
+    "inurl:\"upload_file.php\"",
+    "inurl:\"file_upload.php\"",
+    "inurl:\"upload_image.php\"",
+    "inurl:\"image_upload.php\"",
+    "inurl:\"upload_photo.php\"",
+    "inurl:\"photo_upload.php\"",
+    "inurl:\"upload_document.php\"",
+    "inurl:\"document_upload.php\""
+   ]
+  },
+  {
+   "category": "Path Traversal Vulnerabilities",
+   "dorks": [
+    "inurl:\"view_file.php?file=\"",
+    "inurl:\"read_file.php?path=\"",
+    "inurl:\"display_file.php?file=\"",
+    "inurl:\"open_file.php?filename=\"",
+    "inurl:\"access_file.php?file=\"",
+    "inurl:\"load_file.php?filepath=\"",
+    "inurl:\"fetch_file.php?file=\"",
+    "inurl:\"download_file.php?name=\"",
+    "inurl:\"get_file.php?path=\""
+   ]
+  },
+  {
+   "category": "Unrestricted File Download Vulnerabilities",
+   "dorks": [
+    "inurl:\"download.php?file=\"",
+    "inurl:\"file_download.php?file=\"",
+    "inurl:\"get_file.php?file=\"",
+    "inurl:\"file_get.php?file=\"",
+    "inurl:\"fetch_file.php?name=\"",
+    "inurl:\"get_attachment.php?file=\"",
+    "inurl:\"load_attachment.php?file=\""
+   ]
+  },
+  {
+   "category": "Cross-Origin Resource Sharing (CORS) Vulnerabilities",
+   "dorks": [
+    "inurl:\"access.php?origin=\"",
+    "inurl:\"fetch.php?origin=\"",
+    "inurl:\"request.php?origin=\"",
+    "inurl:\"get_data.php?origin=\"",
+    "inurl:\"load_data.php?origin=\"",
+    "inurl:\"read_data.php?origin=\""
+   ]
+  },
+  {
+   "category": "Remote File Inclusion Vulnerabilities",
+   "dorks": [
+    "inurl:\"include.php?file=\"",
+    "inurl:\"require.php?file=\"",
+    "inurl:\"load_file.php?file=\"",
+    "inurl:\"read_file.php?file=\"",
+    "inurl:\"fetch_file.php?file=\"",
+    "inurl:\"open_file.php?file=\"",
+    "inurl:\"load_url.php?file=\"",
+    "inurl:\"get_url.php?file=\""
+   ]
+  },
+  {
+   "category": "Local File Inclusion Vulnerabilities",
+   "dorks": [
+    "inurl:\"load.php?file=\"",
+    "inurl:\"read.php?file=\"",
+    "inurl:\"fetch.php?file=\"",
+    "inurl:\"open.php?file=\"",
+    "inurl:\"include.php?file=\"",
+    "inurl:\"require.php?file=\"",
+    "inurl:\"access.php?file=\"",
+    "inurl:\"get_file.php?file=\""
+   ]
+  },
+  {
+   "category": "Log File Poisoning Vulnerabilities",
+   "dorks": [
+    "inurl:\"log.php?data=\"",
+    "inurl:\"logs.php?file=\"",
+    "inurl:\"error.php?message=\"",
+    "inurl:\"access_log.php?data=\"",
+    "inurl:\"debug.php?data=\"",
+    "inurl:\"trace.php?log=\"",
+    "inurl:\"audit.php?log=\"",
+    "inurl:\"event_log.php?message=\""
+   ]
+  },
+  {
+   "category": "Insecure Direct Object References (IDOR)",
+   "dorks": [
+    "inurl:\"download.php?file=1\"",
+    "inurl:\"view.php?id=1\"",
+    "inurl:\"show.php?article=1\"",
+    "inurl:\"download_file.php?name=1\""
+   ]
+  },
+  {
+   "category": "XML External Entity (XXE) Vulnerabilities",
+   "dorks": [
+    "inurl:\"process.php?xml=\"",
+    "inurl:\"load.php?xml=\"",
+    "inurl:\"upload_xml.php?data=\"",
+    "inurl:\"execute_xml.php?xml=\"",
+    "inurl:\"parse_xml.php?file=\"",
+    "inurl:\"fetch_xml.php?url=\"",
+    "inurl:\"import_xml.php?file=\""
+   ]
+  },
+  {
+   "category": "Security Misconfigurations",
+   "dorks": [
+    "inurl:\"test.php\"",
+    "inurl:\"debug.php\"",
+    "inurl:\"dev.php\"",
+    "inurl:\"tmp.php\"",
+    "inurl:\"backup.php\"",
+    "inurl:\"config_test.php\"",
+    "inurl:\"setup.php\"",
+    "inurl:\"config.php.sample\"",
+    "inurl:\"example.php\""
+   ]
+  },
+  {
+   "category": "Google Dork Scanners",
+   "dorks": [
+    "intitle:\"DorkScan\" inurl:/search",
+    "intitle:\"GHDB-ID\" inurl:/exploits/",
+    "intitle:\"Google Hacking Database\" inurl:/files/",
+    "intitle:\"Google Dork Search\" inurl:/dorks/",
+    "intitle:\"Dorky\" inurl:/listings/",
+    "intitle:\"Google Dorks\" inurl:/dorks/",
+    "intitle:\"Google Dorking\" inurl:/results/",
+    "intitle:\"Dorkalyzer\" inurl:/scan/",
+    "intitle:\"DorkScanner\" inurl:/scan/"
+   ]
+  },
+  {
+   "category": "WordPress Installation Files",
+   "dorks": [
+    "filetype:log inurl:wp-content/install.php",
+    "filetype:log inurl:wp-content/upgrade-log.php"
+   ]
+  },
+  {
+   "category": "CVE Vulnerabilities",
+   "dorks": [
+    "inurl:cve.php inurl:product-details.php?id=",
+    "inurl:cve.php inurl:display.php?cve=",
+    "inurl:cve.php inurl:product.php?pid=",
+    "inurl:cve.php inurl:details.php?cve=",
+    "inurl:cve.php inurl:show.php?id=",
+    "inurl:cve.php inurl:cve_display.php?cve_id=",
+    "inurl:cve.php inurl:view_cve.php?cve=",
+    "inurl:cve.php inurl:cveinfo.php?cve=",
+    "inurl:cve.php inurl:product.php?prod_id=",
+    "inurl:cve.php inurl:entry.php?cve=",
+    "inurl:cve.php inurl:info.php?cve=",
+    "inurl:cve.php inurl:search.php?name=",
+    "inurl:cve.php inurl:archive.php?cve=",
+    "inurl:cve.php inurl:detail.php?cve=",
+    "inurl:cve.php inurl:reference.php?cve_id=",
+    "inurl:cve.php inurl:cve.cgi?name=",
+    "inurl:cve.php inurl:viewcve.php?cve=",
+    "inurl:cve.php inurl:info.php?id=",
+    "inurl:cve.php inurl:detail.php?id=",
+    "inurl:cve.php inurl:show.php?cve=",
+    "inurl:cve.php inurl:vuln.php?cve=",
+    "inurl:cve.php inurl:vuln-detail.php?cve_id=",
+    "inurl:cve.php inurl:cve_page.php?cve=",
+    "inurl:cve.php inurl:cve_number.php?cve=",
+    "inurl:cve.php inurl:latest.php?id=",
+    "inurl:cve.php inurl:detail.php?cve_id=",
+    "inurl:cve.php inurl:results.php?cve_id=",
+    "inurl:cve.php inurl:display_vulnerability.php?id=",
+    "inurl:cve.php inurl:viewvuln.php?cve=",
+    "inurl:cve.php inurl:vulndetail.php?cve=",
+    "inurl:cve.php inurl:cvedetail.php?cve_id=",
+    "inurl:cve.php inurl:cve_view.php?cve=",
+    "inurl:cve.php inurl:searchresults.php?cve_id="
+   ]
+  },
+  {
+   "category": "Additional CVE Vulnerabilities",
+   "dorks": [
+    "inurl:cve \"CVSS v3 Base Score\"",
+    "inurl:cve \"CVSS Score\"",
+    "inurl:cve \"CVSS:3.0/\"",
+    "inurl:cve \"Vulnerability ID\"",
+    "inurl:cve \"Vulnerability Type\"",
+    "inurl:cve \"Published Date\"",
+    "inurl:cve \"Last Modified Date\"",
+    "inurl:cve \"Description\"",
+    "inurl:cve \"Impact Score\"",
+    "inurl:cve \"CWE-\"",
+    "inurl:cve \"NVD - National Vulnerability Database\"",
+    "inurl:cve \"Vulnerability Summary\"",
+    "inurl:cve \"Vulnerability Statistics\"",
+    "inurl:cve \"Vulnerability Search\"",
+    "inurl:cve \"Vulnerability Details\"",
+    "inurl:cve \"Vulnerability Information\"",
+    "inurl:cve \"Vulnerability Report\"",
+    "inurl:cve \"Security Advisory\"",
+    "inurl:cve \"Security Notice\"",
+    "inurl:cve \"Security Bulletin\"",
+    "inurl:cve \"Security Alert\"",
+    "inurl:cve \"Security Update\"",
+    "inurl:cve \"Exploit Database\"",
+    "inurl:cve \"Exploit Code\"",
+    "inurl:cve \"Exploit Information\"",
+    "inurl:cve \"Exploit Details\"",
+    "inurl:cve \"Exploit Proof of Concept\"",
+    "inurl:cve \"Exploit Source Code\"",
+    "inurl:cve \"Exploit Payload\"",
+    "inurl:cve \"Exploitable Code\"",
+    "inurl:cve \"Exploit Metasploit\"",
+    "inurl:cve \"Exploit Packetstorm\"",
+    "inurl:cve \"Exploit Github\"",
+    "inurl:cve \"Exploit Remote\"",
+    "inurl:cve \"Exploit Local\"",
+    "inurl:cve \"Exploit Privilege Escalation\"",
+    "inurl:cve \"Exploit Code Execution\"",
+    "inurl:cve \"Exploit Denial of Service\"",
+    "inurl:cve \"Exploit SQL Injection\"",
+    "inurl:cve \"Exploit XSS\"",
+    "inurl:cve \"Exploit RCE\"",
+    "inurl:cve \"Exploit LFI\"",
+    "inurl:cve \"Exploit RFI\"",
+    "Remember, with great power comes great responsibility! Use Google dorks ethically and responsibly for research and cybersecurity purposes. Always comply with applicable laws and ethical guidelines while exploring the depths of the internet.",
+    "Happy dorking and stay curious! 😎🔍🌐"
+   ]
+  },
+  {
+   "category": "Git Files (Proviesec)",
+   "dorks": [
+    "inurl:.git-credentials",
+    "inurl:.gitconfig",
+    "intext:\"index of /.git\" \"parent directory\"",
+    "filetype:git -github.com inurl:\"/.git\"",
+    "inurl:ORIG_HEAD",
+    "intitle:\"index of\" \".gitignore\"",
+    "\".git\" intitle:\"Index of\"",
+    "\"Parent Directory\" \"Last modified\" git"
+   ]
+  },
+  {
+   "category": "AWS S3 (Proviesec)",
+   "dorks": [
+    "site:s3.amazonaws.com intitle:index.of.bucket",
+    "site:amazonaws.com inurl:\".s3.amazonaws.com/\"",
+    "site:.s3.amazonaws.com \"Company\"",
+    "intitle:index.of.bucket",
+    "site:s3.amazonaws.com intitle:Bucket loading",
+    "site:*.amazonaws.com inurl:index.html"
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · APPLICATION / PHP / BACKEND",
+   "dorks": [
+    "filetype:log \"PHP Fatal error\"",
+    "filetype:log \"PHP Warning\"",
+    "filetype:log \"PHP Parse error\"",
+    "filetype:log \"Uncaught Exception\"",
+    "filetype:log \"stack trace\"",
+    "inurl:error.log",
+    "inurl:debug.log",
+    "inurl:application.log"
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · AUTH / CREDENTIAL LEAKS",
+   "dorks": [
+    "filetype:log \"password=\"",
+    "filetype:log \"passwd=\"",
+    "filetype:log \"Authorization:\"",
+    "filetype:log \"Bearer \"",
+    "filetype:log \"Set-Cookie\"",
+    "filetype:log \"SESSIONID\"",
+    "filetype:log \"token=\"",
+    "allintext:username password filetype:log"
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · WEB SERVER LOGS",
+   "dorks": [
+    "filetype:log inurl:access.log",
+    "filetype:log inurl:error.log",
+    "filetype:log inurl:nginx",
+    "filetype:log inurl:apache",
+    "filetype:log inurl:httpd",
+    "intitle:\"index of\" \"access.log\"",
+    "intitle:\"index of\" \"error.log\""
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · DATABASE / BACKEND SERVICES",
+   "dorks": [
+    "filetype:log inurl:database",
+    "filetype:log \"SQLSTATE\"",
+    "filetype:log \"PDOException\"",
+    "filetype:log \"ORA-\"",
+    "filetype:log \"mysql error\"",
+    "filetype:log \"PostgreSQL\""
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · CLOUD / CONTAINER / K8S",
+   "dorks": [
+    "filetype:log \"kubernetes\"",
+    "filetype:log \"kube-apiserver\"",
+    "filetype:log \"containerd\"",
+    "filetype:log \"docker\"",
+    "filetype:log \"pod error\"",
+    "filetype:log \"AWS_ACCESS_KEY_ID\"",
+    "filetype:log \"AWS_SECRET_ACCESS_KEY\""
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · CI / DEVOPS",
+   "dorks": [
+    "filetype:log \"Jenkins\"",
+    "filetype:log \"GitLab Runner\"",
+    "filetype:log \"pipeline failed\"",
+    "filetype:log \"build error\""
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · SYSTEM / CRON",
+   "dorks": [
+    "filetype:log cron",
+    "filetype:syslog",
+    "filetype:log \"CRON\"",
+    "filetype:log \"sudo\"",
+    "filetype:log \"ipsec\"",
+    "filetype:log \"ConnectionManager\""
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · NETWORK / SECURITY DEVICES",
+   "dorks": [
+    "filetype:log \"firewall\"",
+    "filetype:log \"VPN\"",
+    "filetype:log \"SSL error\"",
+    "filetype:log \"TLS handshake failed\""
+   ]
+  },
+  {
+   "category": "Log Files (Proviesec) · DIRECTORY LISTING",
+   "dorks": [
+    "intitle:\"index of\" filetype:log",
+    "intitle:\"index of\" \"log\"",
+    "intitle:\"index of\" cleanup.log"
+   ]
+  },
+  {
+   "category": "Bug Bounty (sushiwushi)",
+   "dorks": [
+    "inurl:security.txt",
+    "inurl:security \"reward\"",
+    "insite:\"responsible disclosure\" -inurl:nl",
+    "site:*.gov.* \"responsible disclosure\"",
+    "intext:\"we take security very seriously\"",
+    "site:responsibledisclosure.com",
+    "inurl:'vulnerability-disclosure-policy' reward",
+    "intext:Vulnerability Disclosure site:nl",
+    "intext:Vulnerability Disclosure site:eu",
+    "site:*.*.nl intext:security report reward",
+    "site:*.*.nl intext:responsible disclosure reward",
+    "inurl:/responsible-disclosure/ university",
+    "inurl:/security ext:txt \"contact\"",
+    "inurl:/.well-known/security ext:txt",
+    "inurl:/.well-known/security ext:txt intext:hackerone",
+    "inurl:/.well-known/security ext:txt -hackerone -bugcrowd -synack",
+    "inurl:reporting-security-issues",
+    "inurl:security-policy.txt ext:txt",
+    "site:*.*.* inurl:bug inurl:bounty",
+    "site:help.*.* inurl:bounty",
+    "site:support.*.* intext:security report reward",
+    "intext:security report monetary inurl:security",
+    "intext:security report reward inurl:report",
+    "site:security.*.* inurl:bounty",
+    "site:*.*.de inurl:bug inurl:bounty",
+    "site:*.*.uk intext:security report reward",
+    "site:*.*.cn intext:security report reward",
+    "inurl:responsible-disclosure-policy",
+    "inurl:/security.txt \"mailto\" -github.com -wikipedia.org",
+    "site:*.edu intext:security report vulnerability",
+    "intext:bounty inurl:/security",
+    "inurl:\"bug bounty\" and intext:\"$\" and inurl:/security",
+    "site:*/security.txt \"bounty\"",
+    "inurl:bug bounty intext:\"rupees\"",
+    "inurl:responsible disclosure intext:\"INR\"",
+    "\"security@*\" AND (\"bug bounty\" OR \"vulnerability disclosure\") ext:txt",
+    "inurl:/.well-known/security.txt intext:bounty -hackerone -bugcrowd -synack",
+    "intitle:\"Bug Bounty\" OR intitle:\"Vulnerability Disclosure\" OR intitle:\"Security Rewards\"",
+    "site:*.ca intext:\"responsible disclosure\" intext:reward",
+    "site:*.jp intext:\"vulnerability report\" intext:swag",
+    "site:*.it intext:\"bug bounty\" OR intext:\"security reward\"",
+    "site:*.ch filetype:txt inurl:security intext:bounty",
+    "site:*.es inurl:/seguridad intext:recompensa",
+    "site:*.edu \"responsible disclosure\" AND (reward OR swag OR bounty)",
+    "site:*.edu inurl:/security intext:\"report a vulnerability\"",
+    "site:*.edu intext:\"we run a bug bounty program\"",
+    "site:*.gov* \"vulnerability disclosure program\" OR \"bug bounty\"",
+    "site:*.gov* inurl:/security intext:contact intext:reward",
+    "site:*.gov* filetype:pdf \"vulnerability disclosure policy\"",
+    "inurl:/hackerone.yml -site:hackerone.com",
+    "inurl:/bug-bounty.json | inurl:/vdp.json",
+    "inurl:/security/index.html intext:bounty",
+    "inurl:/legal/security intext:monetary"
+   ]
+  },
+  {
+   "category": "InfoSec Dorks (0xAbbarhSF) · Admin/Login Panels - Google Dorks",
+   "dorks": [
+    "inurl:/cgi-bin/sqwebmail?noframes=1",
+    "inurl:/Citrix/Nfuse17/",
+    "inurl:/dana-na/auth/welcome.html",
+    "inurl:/modcp/ intext:Moderator+vBulletin",
+    "inurl:/SUSAdmin intitle:\"Microsoft Software update Services\"",
+    "inurl:/webedit.* intext:WebEdit Professional -html",
+    "inurl:1810 \"Oracle Enterprise Manager\"",
+    "inurl:2000 intitle:RemotelyAnywhere -site:realvnc.com",
+    "inurl:administrator \"welcome to mambo\"",
+    "inurl:cgi-bin/ultimatebb.cgi?ubb=login",
+    "inurl:Citrix/MetaFrame/default/default.aspx",
+    "inurl:confixx inurl:login|anmeldung",
+    "inurl:coranto.cgi intitle:Login (Authorized Users Only)",
+    "inurl:csCreatePro.cgi",
+    "inurl:default.asp intitle:\"WebCommander\"",
+    "inurl:exchweb/bin/auth/owalogon.asp",
+    "inurl:gnatsweb.pl",
+    "inurl:ids5web",
+    "inurl:irc filetype:cgi cgi:irc",
+    "inurl:login filetype:swf",
+    "inurl:login.asp",
+    "inurl:login.cfm",
+    "inurl:login.php \"SquirrelMail version\"",
+    "inurl:metaframexp/default/login.asp | intitle:\"Metaframe XP Login\"",
+    "inurl:mewebmail",
+    "inurl:names.nsf?opendatabase",
+    "inurl:ocw_login_username",
+    "inurl:orasso.wwsso_app_admin.ls_login",
+    "inurl:postfixadmin intitle:\"postfix admin\" ext:php",
+    "inurl:search/admin.php",
+    "inurl:textpattern/index.php",
+    "inurl:WCP_USER",
+    "inurl:webmail./index.pl \"Interface\"",
+    "inurl:webvpn.html \"login\" \"Please enter your\""
+   ]
+  },
+  {
+   "category": "InfoSec Dorks (0xAbbarhSF) · CCTV Camera online - Google Dorks",
+   "dorks": [
+    "inurl:view/view.shtml",
+    "intitle:\"Live View / - AXIS\" | inurl:view/view.shtml",
+    "inurl:ViewerFrame?Mode=",
+    "inurl:ViewerFrame?Mode=Refresh",
+    "inurl:axis-cgi/jpg",
+    "inurl:axis-cgi/mjpg",
+    "inurl:view/indexFrame.shtml",
+    "inurl:view/index.shtml",
+    "intitle:start inurl:cgistart",
+    "intitle:\"live view\" intitle:axis",
+    "intitle:snc-z20 inurl:home/",
+    "intitle:liveapplet",
+    "intitle:axis intitle:\"video server\"",
+    "intitle:liveapplet inurl:LvAppl",
+    "intitle:\"EvoCam\" inurl:\"webcam.html\"",
+    "inurl:indexFrame.shtml Axis",
+    "inurl:\"MultiCameraFrame?Mode=Motion\"",
+    "allintitle:\"Network Camera NetworkCamera\"",
+    "intitle:\"WJ-NT104 Main Page\"",
+    "intext:\"MOBOTIX M1\" intext:\"Open Menu\"",
+    "intext:\"MOBOTIX M10\" intext:\"Open Menu\"",
+    "intext:\"MOBOTIX D10\" intext:\"Open Menu\"",
+    "intitle:\"netcam live image\"",
+    "intitle:snc-cs3 inurl:home/",
+    "intitle:snc-rz30 inurl:home/",
+    "intitle:\"sony network camera snc-p1\"",
+    "intitle:\"sony network camera snc-m1\"",
+    "site:.viewnetcam.com -www.viewnetcam.com",
+    "allinurl:control/multiview",
+    "intitle:\"supervisioncam protocol\""
+   ]
+  },
+  {
+   "category": "InfoSec Dorks (0xAbbarhSF) · Local File Inclusion - Google Dorks",
+   "dorks": [
+    "inurl:/view/lang/index.php?page=?page=",
+    "inurl:/shared/help.php?page=",
+    "inurl:include_file=",
+    "inurl:include_path=",
+    "inurl:incfile=",
+    "inurl:openfile=",
+    "inurl:showfile=",
+    "inurl:path_to_calendar="
+   ]
+  },
+  {
+   "category": "InfoSec Dorks (0xAbbarhSF) · Sensitive Data - Google Dorks",
+   "dorks": [
+    "filetype:bak createobject sa",
+    "filetype:bak inurl:\"htaccess|passwd|shadow|htusers\"",
+    "filetype:cfg \"mrtg\" target",
+    "filetype:cfm \"cfapplication name\" password",
+    "filetype:conf oekakibbs",
+    "filetype:conf slapd.conf",
+    "filetype:config intext:appSettings \"User ID\"",
+    "filetype:dat \"password.dat\"",
+    "filetype:dat inurl:Sites.dat",
+    "filetype:dat wand.dat",
+    "filetype:inc dbconn",
+    "filetype:inc intext:mysql_connect",
+    "filetype:inc mysql_connect OR mysql_pconnect",
+    "filetype:inf sysprep",
+    "filetype:ini inurl:\"serv-u.ini\"",
+    "filetype:ini inurl:flashFXP.ini",
+    "filetype:ini ServUDaemon",
+    "filetype:ini wcx_ftp",
+    "filetype:ini ws_ftp pwd",
+    "filetype:ldb admin",
+    "filetype:log inurl:\"password.log\"",
+    "filetype:mdb inurl:users.mdb",
+    "filetype:netrc password",
+    "filetype:pass pass intext:userid",
+    "filetype:pem intext:private",
+    "filetype:properties inurl:db intext:password",
+    "filetype:pwd service",
+    "filetype:reg reg +intext:\"defaultusername\" +intext:\"defaultpassword\"",
+    "filetype:reg reg HKEY_CURRENT_USER SSHHOSTKEYS",
+    "filetype:sql +\"IDENTIFIED BY\" -cvs",
+    "filetype:sql password",
+    "filetype:url +inurl:\"ftp://\" +inurl:\";@\"",
+    "filetype:xls username password email",
+    "intitle:\"index of\" intext:connect.inc",
+    "intitle:\"index of\" intext:globals.inc",
+    "intitle:\"Index of\" passwords modified",
+    "intitle:\"Index of\" sc_serv.conf sc_serv content",
+    "intitle:index.of administrators.pwd",
+    "intitle:Index.of etc shadow",
+    "intitle:index.of intext:\"secring.skr\"|\"secring.pgp\"|\"secring.bak\"",
+    "inurl:\"calendarscript/users.txt\"",
+    "inurl:\"GRC.DAT\" intext:\"password\"",
+    "inurl:\"Sites.dat\" \"PASS=\"",
+    "inurl:\"slapd.conf\" intext:\"rootpw\" -manpage -sample",
+    "inurl:\"wvdial.conf\" intext:\"password\"",
+    "inurl:/db/main.mdb",
+    "inurl:/yabb/Members/Admin.dat",
+    "inurl:ccbill filetype:log",
+    "inurl:config.php dbuname dbpass",
+    "inurl:filezilla.xml -cvs",
+    "inurl:lilo.conf filetype:conf password",
+    "inurl:pass.dat",
+    "inurl:perform filetype:ini",
+    "inurl:secring ext:skr | ext:pgp | ext:bak",
+    "inurl:server.cfg rcon password",
+    "inurl:ventrilo_srv.ini adminpassword",
+    "inurl:vtund.conf intext:pass -cvs",
+    "inurl:zebra.conf intext:password -sample",
+    "filetype:conf inurl:firewall -intitle:cvs",
+    "filetype:config web.config -CVS",
+    "filetype:inf inurl:capolicy.inf",
+    "filetype:log access.log -CVS",
+    "filetype:pst inurl:\"outlook.pst\"",
+    "filetype:reg \"Terminal Server Client\"",
+    "filetype:xls inurl:\"email.xls\"",
+    "inurl:email filetype:mdb",
+    "inurl:backup filetype:mdb",
+    "inurl:profiles filetype:mdb",
+    "inurl:forum filetype:mdb",
+    "inurl:admin filetype:xls",
+    "inurl:admin intitle:login",
+    "inurl:\"/_layouts/settings\"",
+    "inurl:ssl.conf filetype:conf",
+    "inurl:server-status \"apache\"",
+    "inurl:server-info \"Apache Server Information\"",
+    "ext:asa | ext:bak intext:uid intext:pwd -\"uid..pwd\"",
+    "ext:inc \"pwd=\" \"UID=\"",
+    "ext:ini eudora.ini",
+    "ext:passwd -intext:the -sample -example",
+    "ext:txt inurl:unattend.txt",
+    "ext:yml database inurl:config",
+    "inurl:htpasswd filetype:htpasswd",
+    "allinurl:auth_user_file.txt",
+    "inurl:passlist.txt"
+   ]
+  },
+  {
+   "category": "InfoSec Dorks (0xAbbarhSF) · Error Messages - Google Dorks",
+   "dorks": [
+    "intitle:\"Apache Tomcat\" \"Error Report\"",
+    "intext:\"Warning: Failed opening\" \"on line\" \"include_path\"",
+    "filetype:log \"PHP Parse error\" | \"PHP Warning\" | \"PHP Error\""
+   ]
+  },
+  {
+   "category": "Google Dorks (BullsEye0) · Google Dork List",
+   "dorks": [
+    "\"100% | 50% | 25%\" \"Back to gallery\" inurl:\"show.php?imageid=\"",
+    "\"1999-2004 FuseTalk Inc\" -site:fusetalk.com",
+    "1. my_egery site:.org",
+    "2. xgery site:.org",
+    "34. keyworld: /phpGedview/login.php site:",
+    "3. coppermine site:.org",
+    "4. 4nAlbum site:.org",
+    "5. inurlP:NphpBB2 site:.org",
+    "+\":8080\" +\":3128\" +\":80\" filetype:txt",
+    "+\":8080? +\":3128? +\":80? filetype:txt",
+    "\"About Winamp Web Interface\" intitle:\"Winamp Web Interface\"",
+    "accdb OR accde intitle:\"index of\" -pub -google -books",
+    "\"Access Denied\" \"Powered by Incapsula\" ext:php",
+    "\"-- Account dump\" ext:sql -git",
+    "\"accounts.xlsx\" ext:xlsx",
+    "ACID \"by Roman Danyliw\" filetype:php",
+    "\"Active Webcam Page\" inurl:8080",
+    "\"adding new user\" inurl:addnewuser -\"there are no domains\"",
+    "\"admin account info\" filetype:log",
+    "admin account info\" filetype:log",
+    "Admin intitle:\"eZ publish administration\"",
+    "administrator/components/com_comprofiler/plugin.class.php?mosConfig_absolute_path= /tools/send_reminders.php?includedir= allinurl:day.php?date=",
+    "\"# AdwCleaner\" ext:txt",
+    "allintext:\"Browse Blogs by Category\"",
+    "allintext:\"Browse our directory of our members top sites or create your own for free!\"",
+    "allintext:Copyright Smart PHP Poll. All Rights Reserved. -exploit",
+    "allintext:D.N.I filetype:xls",
+    "allintext:\"fs-admin.php\"",
+    "allintext:\"Home Member Search Chat Room Forum Help/Support privacy policy\"",
+    "allintext:'HttpFileServer 2.3k'",
+    "allintext:\" If you would like to contact us, our email address is\" traffic",
+    "allintext: /iissamples/default/",
+    "allintext:\"Latest Pictures\" Name Gender Profile Rating",
+    "allintext: \"Please login to continue...\" \"ZTE Corporation. All rights reserved.\"",
+    "allintext:\"Powered By Buddy Zone\"",
+    "allintext:\"Powered by LionMax Software\" \"WWW File Share\"",
+    "allintext:\"Powered by: TotalCalendar\"",
+    "allintext: /qcodo/_devtools/codegen.php",
+    "allintext:\"SuperCali Event Calendar\"",
+    "allintext: \"This site is powered by IndexScript\"",
+    "allintext:\"WebServerX Server at\"",
+    "allintitle:admin.php",
+    "allintitle:aspjar.com guestbook",
+    "allintitle: Axis 2.10 OR 2.12 OR 2.30 OR 2.31 OR 2.32 OR 2.33 OR 2.34 OR 2.40 OR 2.42 OR 2.43 \"Network Camera \"",
+    "allintitle:Brains, Corp. camera",
+    "allintitle:\"DVR login\"",
+    "allintitle: EDR1600 login | Welcome",
+    "allintitle:Edr1680 remote viewer",
+    "allintitle: EDR400 login | Welcome",
+    "allintitle: EverFocus | EDSR | EDSR400 Applet",
+    "allintitle:\"FirstClass Login\"",
+    "allintitle: \"Flexi Press System\"",
+    "allintitle:\"Forum Post Assistant :\" ext:php -site:joomla.org",
+    "allintitle: \"index of/admin\"",
+    "allintitle:\"Index of /Admin/Common\" | allintext:\"Parent Directory\"",
+    "allintitle: \"index of/root\"",
+    "allintitle:\"Index of /ThinkPHP\" | inurl: \"/ThinkPHP/\"",
+    "allintitle: \"MCgallery 0.5b\"",
+    "allintitle:Netscape FastTrack Server Home Page",
+    "allintitle:*.php?filename=*",
+    "allintitle:.php?filename=",
+    "allintitle:*.php?logon=*",
+    "allintitle:.php?logon=",
+    "allintitle:*.php?page=*",
+    "allintitle:.php?page=",
+    "allintitle: powered by DeluxeBB",
+    "allintitle: restricted filetype:doc site:gov",
+    "allintitle:restricted filetype:doc site:gov",
+    "allintitle: restricted filetype :mail",
+    "allintitle: sensitive filetype:doc",
+    "allintitle:\"SyncThru Web Service\"",
+    "allintitle:..\"Test page for Apache Installation..\"",
+    "allintitle:\"UniMep Station Controller\"",
+    "allintitle:\"Welcome to the Cyclades\"",
+    "allinurl: admin mdb",
+    "allinurl:admin mdb",
+    "allinurl: aid \"com_xfaq\"",
+    "allinurl:\"article.download.php\"",
+    "allinurl:asdm.jnlp",
+    "allinurl:awstats.pl?config=",
+    "allinurl:awstats.pl ext:pl",
+    "allinurl:.br/index.php?loc=",
+    "allinurl:buyer/index.php?ProductID=",
+    "allinurl:casting_view.php?adnum=",
+    "allinurl:cdkey.txt",
+    "allinurl:\"channel_detail.php?chid=\"",
+    "allinurl: cid\"modules/classifieds/index.php?pa=Adsview\"",
+    "allinurl:clientsignup.php \"classifieds\"",
+    "allinurl:\"com_accombo\"",
+    "allinurl: \"com_actualite\"",
+    "allinurl:\"com_ahsshop\"do=default",
+    "allinurl: \"com_alberghi\" detail",
+    "allinurl:\"com_candle\"",
+    "allinurl:\"com_cinema\"",
+    "allinurl: com_clasifier",
+    "allinurl:com_comprofiler",
+    "allinurl: \"com_estateagent\"",
+    "allinurl:\"com_extcalendar\"",
+    "allinurl: \"com_galeria\"",
+    "allinurl: com_gallery \"func\"",
+    "allinurl:\"com_garyscookbook\"",
+    "allinurl: \"com_glossary\"",
+    "allinurl: \"com_joovideo\" detail",
+    "allinurl:com_jpad",
+    "allinurl: com_mcquiz \"tid\"",
+    "allinurl:\"com_na_content\"",
+    "allinurl:\"com_neogallery\"",
+    "allinurl:\"com_n-gallery\"",
+    "allinurl: com_paxxgallery \"userid\"",
+    "allinurl: com_pcchess \"user_id\"",
+    "allinurl:com_pccookbook",
+    "allinurl: com_quiz\"tid\"",
+    "allinurl: \"com_rapidrecipe\"user_id",
+    "allinurl:\"com_restaurante\"",
+    "allinurl: com_ricette",
+    "allinurl:\"com_simpleshop\"",
+    "allinurl:\"detResolucion.php?tipodoc_id=\"",
+    "allinurl:DialogHandler.aspx",
+    "allinurl:directory.php?ax=list",
+    "allinurl: drive.google.com/open?id=",
+    "allinurl: e107_plugins/easyshop/easyshop.php",
+    "allinurl:/examples/jsp/snp/snoop.jsp",
+    "allinurl:\"exchange/logon.asp\"",
+    "allinurl:flashblog.html \"flashblog\"",
+    "allinurl:foldercontent.html?folder=",
+    "allinurl:forcedownload.php?file=",
+    "allinurl:forum_answer.php?que_id=",
+    "allinurl:fullview.php?tempid=",
+    "allinurl: galid \"index.php?p=gallerypic\"",
+    "allinurl:/hide_my_wp=",
+    "allinurl:http://www.google.co.in/latitude/apps/badge/api?user=",
+    "allinurl: id \"com_jooget\"",
+    "allinurl:index.htm?cus?audio",
+    "allinurl:index.php?act=publ",
+    "allinurl: \"index.php?area\"galid",
+    "allinurl:index.php?db=information_schema",
+    "allinurl:\"index.php?mod=archives\"",
+    "allinurl: \"index.php?mod=galerie\"action=gal",
+    "allinurl: \"index.php?option=com_doc\"",
+    "allinurl: \"index.php?p=gallerypic img_id\"",
+    "allinurl: \"index.php?p=poll\"showresult",
+    "allinurl: \"index php p shop\"categ",
+    "allinurl: \"index.php?showlink\"links",
+    "allinurl:\"index.php\" \"site=sglinks\"",
+    "allinurl:\"index.php?site=\" \"W-Agora\"",
+    "allinurl:install/install.php",
+    "allinurl:intranet admin",
+    "allinurl: In YoUr Dream Lamerz",
+    "allinurl:\"jokes.php?catagorie=\"",
+    "allinurl:\"/lildbi/\"",
+    "allinurl:links.php?t=search",
+    "allinurl:\"lyrics_menu/lyrics_song.php?l_id=\"",
+    "allinurl:/m2f_usercp.php?",
+    "allinurl:\"macgurublog.php?uid=\"",
+    "allinurl:\"/main/auth/profile.php\" -github -google",
+    "allinurl:mc4wp-debug.log ext:log",
+    "allinurl:\"members.asp?action\"",
+    "allinurl:moadmin.php -google -github",
+    "allinurl:/modernbill/",
+    "allinurl: \"modules/dictionary\"",
+    "allinurl: \"modules/dictionary/detail.php?id\"",
+    "allinurl :\"modules/eblog\"",
+    "allinurl: \"modules/eEmpregos/index.php\"",
+    "allinurl :\"modules/gallery\"",
+    "allinurl: \"modules/glossaires\"",
+    "allinurl: \"modules MyAnnonces index php pa view\"",
+    "allinurl: \"/modules/myTopics/\"",
+    "allinurl:\"modules/photo/viewcat.php?id\"",
+    "allinurl: modules-php-name-Siir",
+    "allinurl: modules-php-op-modload \"req view_cat\"",
+    "allinurl :\"modules/recipe\"",
+    "allinurl :\"/modules/tutorials/\"",
+    "allinurl: \"modules/wfdownloads/viewcat.php?cid\"",
+    "allinurl:/myspeach/",
+    "allinurl: \"name Sections op viewarticle artid\"",
+    "allinurl:\".nsconfig\" -sample -howto -tutorial",
+    "allinurl:offers_buy.php?id=",
+    "allinurl:offers.php?id=",
+    "allinurl:option=com_livechat",
+    "allinurl:option=com_rsmonials",
+    "allinurl: op=viewslink&sid=",
+    "allinurl:\"owa/auth/logon.aspx\" -google -github",
+    "allinurl: page_id album \"photo\"",
+    "allinurl:/phpress/",
+    "allinurl:*.php?txtCodiInfo=",
+    "allinurl:.php?txtCodiInfo=",
+    "allinurl: \"pollBooth.php?op=results\"pollID",
+    "allinurl:\"/questcms/\"",
+    "allinurl:readmore.php?news_id",
+    "allinurl:\".r{}_vti_cnf/\"",
+    "allinurl:servlet/SnoopServlet",
+    "allinurl:\"shop.htm?shopMGID=\"",
+    "allinurl: \"showCat.php?cat_id\"",
+    "allinurl:show_memorial.php?id=",
+    "allinurl:\"/SilverStream/Meta/\"",
+    "allinurl:spaw2/dialogs/",
+    "allinurl:tseekdir.cgi",
+    "allinurl:\"/ubbthreads/\"",
+    "allinurl:\"User_info/auth_user_file.txt\"",
+    "allinurl:\"verliadmin\"",
+    "allinurl:\"/*/_vti_pvt/\" | allinurl:\"/*/_vti_cnf/\"",
+    "allinurl : /web3news/",
+    "allinurl:\"weblog/referrers\"",
+    "allinurl: \"wordspew-rss.php\"",
+    "allinurl :\"wp-content/plugins/st_newsletter\"",
+    "allinurl:\"wp-content/plugins/wordpress-popup/views/admin/\"",
+    "allinurl:\"/wp-content/plugins/wp-noexternallinks\"",
+    "allinurl:wp-content/plugins/wptf-image-gallery/",
+    "allinurl:wps/portal/ login",
+    "allinurl:/xampp/security.php",
+    "allinurl:\"xGb.php\"",
+    "allinurl:\"zimbra/?zinitmode=http\" -google -github",
+    "\"All site content\" ext:aspx",
+    "AndroidManifest ext:xml -github -gitlab -googlesource",
+    "\"ansible.log\" | \"playbook.yaml\" | \".ansible.cfg\" | \"playbook.yml\" | host.ini intitle:\"index of\"",
+    "\"AnWeb/1.42h\" intitle:index.of",
+    "AnyBoard\" intitle:\"If you are a new user:\" intext:\"Forum",
+    "AnyBoard\" inurl:gochat -edu",
+    "\"APC Console Port Management Server\" intitle:\"Console Port Management Server\"",
+    "\"A syntax error has occurred\" filetype:ihtml",
+    "\"authentication failure; logname=\" ext:log",
+    "Auth inurl:welcome ext:cgi",
+    "\"automatic teller\" \"operator manual\" \"password\" filetype:pdf",
+    "axis storpoint \"file view\" inurl:/volumes/",
+    "\"battlefield\" \"email\" site:pastebin.com",
+    "BEGIN (CERTIFICATE|DSA|RSA) filetype:csr",
+    "BEGIN (CERTIFICATE|DSA|RSA) filetype:key",
+    "\"-----BEGIN RSA PRIVATE KEY-----\" ext:key",
+    "\"BEGIN RSA PRIVATE KEY\" filetype:key -github",
+    "\"-----BEGIN X509 CERTIFICATE-----\" ext:pem -git",
+    "\"Below is a rendering of the page up to the first error.\" ext:xml",
+    "Bill Gates intitle:\"index.of\" \"parent directory\" \"size\" \"last modified\" \"description\" Microsoft (pdf|txt|epub|doc|docx) -inurl:(jsp|php|html|aspx|htm|cf|shtml|ebooks|ebook) -site:.info",
+    "\"Blocking Reason:\" ext:log -git",
+    "\"[boot loader]\" \"WINNT\" ext:ini",
+    "\"bp blog admin\" intitle:login | intitle:admin -site:johnny.ihackstuff.com",
+    "\"By Geeklog\" \"Created this page in\" +seconds +powered inurl:public_html",
+    "\"by Reimar Hoven. All Rights Reserved. Disclaimer\" | inurl:\"log/logdb.dta\"",
+    "CakePHP filetype:sql intext:password | pwd intext:username | uname intext: Insert into users values",
+    "CakePHP inurl:database.php intext:db_password",
+    "\"CakeRoutingException\" -site:github.com -site:stackoverflow.com -site:cakephp.org\"",
+    "\"Calendar programming by AppIdeas.com\" filetype:php",
+    "camera linksys inurl:main.cgi",
+    "\"Can't connect to local\" intitle:warning",
+    "\"Certificate Practice Statement\" inurl:(PDF | DOC)",
+    "\"CF-Host-Origin-IP\" \"CF-Int-Brand-ID\" \"CF-RAY\" \"CF-Visitor\" \"github\" -site:github.com -site:cloudfare.com",
+    "Codeigniter filetype:sql intext:password | pwd intext:username | uname intext: Insert into users values",
+    "confidential site:mil",
+    "\"Config\" intitle:\"Index of\" intext:vpn",
+    "configuration> + filetype:config -github.com",
+    "\"configure account user encrypted\" ext:cfg",
+    "config.yaml intitle:\"index of\" vagrantfile",
+    "ConnectionTest.java filetype:html",
+    "\"Consola de Joomla! Debug\" inurl:index.php",
+    "contacts ext:wml",
+    "\"contrasena\" filetype:sql -github.com",
+    "\"CosmoShop by Zaunz Publishing\" inurl:\"cgi-bin/cosmoshop/lshop.cgi\" -johnny.ihackstuff.com -V8.10.106 -V8.10.100 -V.8.10.85 -V8.10.108 -V8.11*",
+    "\"create account\" admin ext:cfg",
+    "crime24 stealer ext:txt",
+    "\"database_password\" filetype:yml \"config/parameters.yml",
+    "\"database_password\" filetype:yml \"config/parameters.yml\"",
+    "data filetype:mdb -site:gov -site:mil",
+    "db_password filetype:env",
+    "db_password filetype:env -site:github.com -git",
+    "DB_USERNAME filetype:env",
+    "DCS inurl:\"/web/login.asp\"",
+    "\"Declassified and Approved for Release by\" filetype: pdf",
+    "\"delete entries\" inurl:admin/delete.asp",
+    "\"delivered by mailman\" inurl:admin/mailman | intitle:\"Mailman Administrator Authentication\"",
+    "\"department\" | \"agency\" | \"government\" \"intitle:\"login form\" -youtube -template",
+    "\"description\" & \"size\" intitle:\"index of\" \"owncloud\"",
+    "\"Desktop\" parent intitle:index.of",
+    "\"d-i passwd/root-password-crypted password\" ext:cfg",
+    ":DIR | intitle:index of inurl://whatsapp/",
+    "\"dirLIST - PHP Directory Lister\" \"Banned files: php | php3 | php4 | php5 | htaccess | htpasswd | asp | aspx\" \"index of\" ext:php",
+    "\"[dirs]\" inurl:\"mirc.ini\" -git",
+    "Display Cameras intitle:\"Express6 Live Image\"",
+    "\"display printer status\" intitle:\"Home\"",
+    "(\"DMZ\" | \"Public IP\" | \"Private IP\") filetype:xls",
+    "\"Do not distribute\" (ext:pdf | ext:doc | ext:docx | ext:rtf)",
+    "dorks:SiteScope inurl:/SiteScope/cgi/go.exe/SiteScope?page=",
+    "\"Duclassified\" -site:duware.com \"DUware All Rights reserved\"",
+    "Duclassified\" -site:duware.com \"DUware All Rights reserved\"",
+    "\"duclassmate\" -site:duware.com",
+    "duclassmate\" -site:duware.com",
+    "\"Dudirectory\" -site:duware.com",
+    "Dudirectory\" -site:duware.com",
+    "\"dudownload\" -site:duware.com",
+    "dudownload\" -site:duware.com",
+    "\"-- Dumping data for table\" ext:sql",
+    "\"DUpaypal\" -site:duware.com",
+    "DUpaypal\" -site:duware.com",
+    "DWMail\" password intitle:dwmail",
+    "dwsync.xml intitle:index of -gitlab -github",
+    "\"e107.org 2002/2003\" inurl:forum_post.php?nt",
+    "\"e107.org 2002/2003? inurl:forum_post.php?nt",
+    "eggdrop filetype:user user",
+    "\"El Moujahidin Bypass Shell\" ext:php",
+    "e-mail address filetype:csv csv",
+    "\"Email delivery powered by Google\" ext:pdf OR ext:txt",
+    "/embed/day.php?path= intitle:\"Login to Calendar\"",
+    "employee \"training\" intitle:index.of ext:doc | pdf | xls |docx |xlsx",
+    "\"enable password\" ext:cfg -git -cisco.com",
+    "enable password | secret \"current configuration\" -intext:the",
+    "\"enable secret\" ext:cfg -git -cisco.com",
+    "\"END_FILE\" inurl:\"/password.log\"",
+    "\" End Stealer \" ext:txt",
+    "\"Enter ip\" inurl:\"php-ping.php\"",
+    "\"Error Diagnostic Information\" intitle:\"Error Occurred While\"",
+    "\"error found handling the request\" cocoon filetype:xml",
+    "\"error_log\" inurl:/wp-content",
+    "\"Establishing a secure Integrated Lights Out session with\" OR intitle:\"Data Frame - Browser not HTTP 1.1 compatible\" OR intitle:\"HP Integrated Lights-",
+    "\"Establishing a secure Integrated Lights Out session with\" OR intitle:\"Data Frame – Browser not HTTP 1.1 compatible\" OR intitle:\"HP Integrated Lights-",
+    "etc (index.of)"
+   ]
+  }
+ ]
+}
