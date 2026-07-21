@@ -25,10 +25,11 @@
   .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
   .form-top{display:grid;grid-template-columns:1fr 120px 140px;gap:12px;align-items:end}
   label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
-  input[type=text],input[type=number],input[type=url]{width:100%;background:var(--panel2);
+  input[type=text],input[type=number],input[type=url],select{width:100%;background:var(--panel2);
     border:1px solid var(--border);color:var(--txt);border-radius:8px;padding:10px 11px;font:inherit}
   input#domain{font-size:16px}
-  input:focus{outline:none;border-color:var(--accent2)}
+  input:focus,select:focus{outline:none;border-color:var(--accent2)}
+  input:disabled{opacity:.45}
   .btn{border:none;font:inherit;font-weight:700;padding:11px 16px;border-radius:8px;cursor:pointer;white-space:nowrap}
   .btn-go{background:var(--accent);color:#062018;width:100%}
   .btn-go.scanning{background:var(--err);color:#2a0810}
@@ -43,7 +44,7 @@
   .src input{accent-color:var(--accent)}
 
   .verifybar{margin-top:14px;border-top:1px dashed var(--border);padding-top:13px;
-    display:grid;grid-template-columns:1fr 110px 90px 90px auto;gap:10px;align-items:end}
+    display:grid;grid-template-columns:150px 1fr 90px 90px 90px auto;gap:10px;align-items:end}
   .verifybar .full{grid-column:1/-1;color:var(--muted);font-size:12px;margin:0 0 2px}
   .btn-ping{background:var(--panel2);border:1px solid var(--border);color:var(--txt)}
   #pingmsg{font-size:12px}
@@ -92,6 +93,10 @@
   .ep .badge.has{color:var(--hit);border-color:#3a2530}
 
   .sidebar-empty,.cat-empty{color:var(--muted);font-size:12px;padding:18px 6px;text-align:center}
+  .sbtools{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .sbtools input[type=text]{flex:1;min-width:80px;padding:6px 9px}
+  .sbtools .mini{white-space:nowrap}
+  #addrow input{width:100%;padding:6px 9px}
 
   /* catálogo */
   .tools{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
@@ -154,13 +159,15 @@
     </div>
 
     <div class="verifybar">
-      <p class="full">Verificación de hallazgos con <b>SearXNG</b> (opcional, gratis): levanta tu instancia
-        y pega su URL. SubDork consultará cada dork y llenará la tabla de hallazgos solo con los que devuelven resultados.</p>
-      <div><label>URL de SearXNG</label><input id="searxng" type="url" placeholder="http://localhost:8888" value="http://localhost:8888" /></div>
-      <div><label>Máx. consultas</label><input id="vmax" type="number" min="1" value="150" /></div>
-      <div><label>Concurrencia</label><input id="vconc" type="number" min="1" max="8" value="3" /></div>
-      <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="1" /></div>
-      <div><button id="ping" class="btn btn-ping">probar conexión</button></div>
+      <p class="full">Verificación de hallazgos (opcional): <b>DuckDuckGo</b> funciona sin instalar nada;
+        <b>SearXNG</b> requiere tu instancia local. Solo se listan los dorks que devuelven resultados.</p>
+      <div><label>Motor</label>
+        <select id="vengine"><option value="duckduckgo">DuckDuckGo</option><option value="searxng">SearXNG</option></select></div>
+      <div><label>URL de SearXNG</label><input id="searxng" type="url" placeholder="http://localhost:8888" disabled /></div>
+      <div><label>Máx.</label><input id="vmax" type="number" min="1" value="150" /></div>
+      <div><label>Concurr.</label><input id="vconc" type="number" min="1" max="8" value="2" /></div>
+      <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="1.5" /></div>
+      <div><button id="ping" class="btn btn-ping">probar</button></div>
       <div class="full"><span id="pingmsg"></span></div>
     </div>
   </div>
@@ -185,8 +192,16 @@
     <!-- SIDEBAR: endpoints -->
     <div class="col">
       <div class="colhd"><h3>Endpoints</h3><span class="grow"></span><span class="chip" id="ep_count">0</span></div>
+      <div class="sbtools">
+        <input type="text" id="epfilter" placeholder="filtrar…" />
+        <button class="mini" id="addBtn" title="agregar subdominios a mano">＋ agregar</button>
+        <label class="mini" id="fileLbl" title="subir un .txt con subdominios">⬆ .txt<input type="file" id="epfile" accept=".txt,text/plain" hidden /></label>
+      </div>
+      <div id="addrow" style="display:none;padding:8px 10px;border-bottom:1px solid var(--border)">
+        <input type="text" id="addinput" placeholder="host1.dom.com, host2.dom.com … (Enter para agregar)" />
+      </div>
       <div class="colbody" id="sidebar">
-        <div class="sidebar-empty">Escanea un dominio para listar sus subdominios aquí.</div>
+        <div class="sidebar-empty">Escanea un dominio, o agrega subdominios con <b>＋</b> / <b>⬆ .txt</b>.</div>
       </div>
     </div>
 
@@ -263,7 +278,8 @@ function addEndpoint(host,level,source){
   const first=endpoints.size===0;
   const sb=$('sidebar'); if(first) sb.innerHTML='';
   const item=document.createElement('div'); item.className='ep';
-  item.innerHTML=`<span class="h">${esc(host)}</span><span class="lvl">N${level}</span><span class="badge" title="hallazgos">0</span>`;
+  const lbl=(level==='M')?'man':('N'+level);
+  item.innerHTML=`<span class="h">${esc(host)}</span><span class="lvl">${lbl}</span><span class="badge" title="hallazgos">0</span>`;
   item.addEventListener('click',()=>selectEndpoint(host));
   sb.appendChild(item);
   const rec={item,level,source,hits:[],verified:false,verifying:false};
@@ -390,15 +406,16 @@ function updateVerifyBtn(host){
 }
 function verifyHost(host){
   const rec=endpoints.get(host); if(!rec)return;
+  const engine=$('vengine').value;
   const base=$('searxng').value.trim();
-  if(!base){$('pingmsg').innerHTML='<span style="color:var(--err)">pon la URL de SearXNG primero</span>';return;}
+  if(engine==='searxng'&&!base){$('pingmsg').innerHTML='<span style="color:var(--err)">pon la URL de SearXNG primero</span>';return;}
   if(rec.verifying){ stopVerify(); return; }
   // reinicia hallazgos de este host
-  rec.hits=[]; rec.verified=false; renderFindings(host);
+  rec.hits=[]; rec.verified=false; rec.errored=false; renderFindings(host);
   rec.verifying=true; updateVerifyBtn(host);
-  const p=new URLSearchParams({host,searxng:base,max:$('vmax').value,concurrency:$('vconc').value,delay:$('vdelay').value});
+  const p=new URLSearchParams({host,engine,searxng:base,max:$('vmax').value,concurrency:$('vconc').value,delay:$('vdelay').value});
   $('vprog').textContent='iniciando…';
-  log('info',`verificando ${host} con SearXNG (máx ${$('vmax').value}, delay ${$('vdelay').value}s)`);
+  log('info',`verificando ${host} con ${engine} (máx ${$('vmax').value}, delay ${$('vdelay').value}s)`);
   ves=new EventSource('/api/verify/stream?'+p.toString());
   ves.onmessage=(m)=>handleVerify(JSON.parse(m.data));
   ves.onerror=()=>{log('warn','verificación: conexión cerrada');finishVerify(host);};
@@ -415,9 +432,11 @@ function handleVerify(ev){
       log('ok',`  ! hallazgo [${ev.category}] ${ev.host}`);break;
     case 'verify_error':log('err','SearXNG: '+ev.message);
       $('pingmsg').innerHTML='<span style="color:var(--err)">'+esc(ev.message)+'</span>';break;
-    case 'verify_done':$('vprog').textContent=`✓ ${ev.checked} revisados · ${ev.hits} hallazgos`;
-      log('ok',`verificación de ${ev.host} lista: ${ev.hits}/${ev.checked}`);
-      if(rec)rec.verified=true; finishVerify(ev.host);break;
+    case 'verify_done':
+      if(ev.errored){$('vprog').innerHTML='<span style="color:var(--err)">verificación detenida por error</span>';}
+      else{$('vprog').textContent=`✓ ${ev.checked} revisados · ${ev.hits} hallazgos`;
+        log('ok',`verificación de ${ev.host} lista: ${ev.hits}/${ev.checked}`);}
+      if(rec)rec.verified=!ev.errored; finishVerify(ev.host);break;
     case 'error':log('err',ev.message);finishVerify(ev.host);break;
   }
 }
@@ -426,13 +445,36 @@ function finishVerify(host){if(ves){ves.close();ves=null;} const r=endpoints.get
 
 /* ---------- ping SearXNG ---------- */
 async function pingSearxng(){
+  const engine=$('vengine').value;
   const base=$('searxng').value.trim();
   $('pingmsg').innerHTML='<span style="color:var(--muted)">probando…</span>';
   try{
-    const r=await fetch('/api/verify/ping?searxng='+encodeURIComponent(base)).then(x=>x.json());
-    $('pingmsg').innerHTML=r.ok?'<span style="color:var(--accent)">✓ SearXNG responde (JSON ok)</span>'
+    const r=await fetch(`/api/verify/ping?engine=${engine}&searxng=${encodeURIComponent(base)}`).then(x=>x.json());
+    $('pingmsg').innerHTML=r.ok?`<span style="color:var(--accent)">✓ ${engine} responde</span>`
       :'<span style="color:var(--err)">✗ '+esc(r.error)+'</span>';
   }catch(e){$('pingmsg').innerHTML='<span style="color:var(--err)">✗ '+esc(e.message)+'</span>';}
+}
+
+/* ---------- agregar subdominios manual / .txt / filtro ---------- */
+function cleanHost(s){
+  s=(s||'').trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'').replace(/^\*+\.?/,'').replace(/\.$/,'');
+  return /^[a-z0-9]([a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/.test(s)?s:null;
+}
+function addManualHosts(text){
+  const parts=(text||'').split(/[\s,;]+/).map(cleanHost).filter(Boolean);
+  let added=0;
+  parts.forEach(h=>{ if(!endpoints.has(h)){ addEndpoint(h,'M','manual'); added++; } });
+  if(added){ log('ok',`agregados ${added} subdominio(s) manualmente`); }
+  else if(parts.length===0){ log('warn','no había hosts válidos para agregar'); }
+  return added;
+}
+function toggleAddRow(){
+  const r=$('addrow'); const show=r.style.display==='none';
+  r.style.display=show?'block':'none'; if(show)$('addinput').focus();
+}
+function filterSidebar(){
+  const q=$('epfilter').value.toLowerCase();
+  endpoints.forEach((rec,host)=>{ rec.item.style.display=(!q||host.includes(q))?'':'none'; });
 }
 
 /* ---------- eventos UI ---------- */
@@ -440,6 +482,29 @@ $('go').addEventListener('click',()=>es?stop():start());
 $('domain').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
 $('verifyBtn').addEventListener('click',()=>{if(selected)verifyHost(selected);});
 $('ping').addEventListener('click',pingSearxng);
+
+// motor: habilita el campo URL solo para SearXNG
+$('vengine').addEventListener('change',()=>{
+  const isSx=$('vengine').value==='searxng';
+  $('searxng').disabled=!isSx;
+  if(isSx&&!$('searxng').value) $('searxng').value='http://localhost:8888';
+  $('pingmsg').textContent='';
+});
+
+// agregar subdominios a mano
+$('addBtn').addEventListener('click',toggleAddRow);
+$('addinput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){ if(addManualHosts($('addinput').value)>0){$('addinput').value='';} }
+});
+// subir .txt
+$('epfile').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{ const n=addManualHosts(rd.result); log('info',`.txt "${f.name}": ${n} subdominio(s) agregados`); };
+  rd.readAsText(f); e.target.value='';
+});
+// filtro del sidebar
+$('epfilter').addEventListener('input',filterSidebar);
 </script>
 </body>
 </html>

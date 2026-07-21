@@ -163,11 +163,14 @@ async def scan_stream(request: Request):
 
 @app.get("/api/verify/ping")
 async def verify_ping(request: Request):
-    base = request.query_params.get("searxng", "")
-    return JSONResponse(await searxng_ping(base))
+    q = request.query_params
+    engine = q.get("engine", "duckduckgo")
+    base = q.get("searxng", "")
+    return JSONResponse(await searxng_ping(engine, base))
 
 
-async def _run_verify(request: Request, host: str, base: str, mx: int, conc: int, delay: float):
+async def _run_verify(request: Request, host: str, engine: str, base: str,
+                      mx: int, conc: int, delay: float):
     queue: asyncio.Queue = asyncio.Queue()
 
     async def emit(ev: dict):
@@ -177,7 +180,8 @@ async def _run_verify(request: Request, host: str, base: str, mx: int, conc: int
 
     async def worker():
         try:
-            await verify_host(host, dorks, base, emit, request.is_disconnected,
+            await verify_host(host, dorks, emit, engine=engine, base_url=base,
+                              is_disconnected=request.is_disconnected,
                               max_queries=mx, concurrency=conc, delay=delay)
         except Exception as exc:  # noqa: BLE001
             await emit({"type": "error", "message": str(exc)})
@@ -199,15 +203,16 @@ async def _run_verify(request: Request, host: str, base: str, mx: int, conc: int
 async def verify_stream(request: Request):
     q = request.query_params
     host = (q.get("host") or "").strip().lower()
+    engine = q.get("engine", "duckduckgo")
     base = (q.get("searxng") or "").strip()
     if not host or "." not in host:
         return JSONResponse({"error": "host inválido"}, status_code=400)
-    if not base:
+    if engine == "searxng" and not base:
         return JSONResponse({"error": "falta la URL de SearXNG"}, status_code=400)
     try:
-        mx = max(1, min(2000, int(q.get("max", "200"))))
+        mx = max(1, min(2000, int(q.get("max", "150"))))
     except ValueError:
-        mx = 200
+        mx = 150
     try:
         conc = max(1, min(8, int(q.get("concurrency", "3"))))
     except ValueError:
@@ -217,7 +222,7 @@ async def verify_stream(request: Request):
     except ValueError:
         delay = 1.0
     return StreamingResponse(
-        _run_verify(request, host, base, mx, conc, delay),
+        _run_verify(request, host, engine, base, mx, conc, delay),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

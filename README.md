@@ -84,12 +84,25 @@ python -m uvicorn app:app --app-dir backend --host 127.0.0.1 --port 8000
    endpoint seleccionado) y panel derecho **"Hallazgos validados"** (tabla).
 5. Clic en un dork → se abre la búsqueda en Google (ejecución manual).
 
-## Verificación de hallazgos con SearXNG (gratis, sin claves)
+## Agregar subdominios a mano / por .txt
 
-Para que la tabla de **hallazgos** se llene automáticamente (solo dorks que
-devuelven resultados), SubDork consulta una instancia self-hosted de
-[SearXNG](https://github.com/searxng/searxng) — metabuscador open-source, sin
-clave ni facturación.
+En la columna **Endpoints** puedes:
+
+- **＋ agregar**: escribe uno o varios hosts (separados por coma/espacio/Enter).
+- **⬆ .txt**: sube un archivo de texto con un subdominio por línea.
+- **filtrar…**: busca dentro de la lista cuando hay muchos endpoints.
+
+Cada subdominio agregado obtiene su catálogo completo de dorks y puede verificarse.
+
+## Verificación de hallazgos (gratis)
+
+La tabla de **hallazgos** se llena solo con los dorks que devuelven resultados.
+Hay dos motores (selector en la barra de verificación):
+
+- **DuckDuckGo** (por defecto): funciona **sin instalar nada ni claves**. Ideal para
+  empezar. Puede limitarte si disparas mucho volumen, así que usa el `delay`.
+- **SearXNG**: tu instancia self-hosted ([searxng](https://github.com/searxng/searxng)),
+  sin límites de pago. Requiere levantar el contenedor:
 
 1. Levanta SearXNG con Docker:
    ```bash
