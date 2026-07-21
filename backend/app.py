@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import random
 import shutil
 from pathlib import Path
@@ -205,8 +206,7 @@ async def searxng_status():
     }
 
 
-@app.get("/api/searxng/up")
-async def searxng_up():
+async def _searxng_bring_up(wait_cycles: int = 30) -> dict:
     """Descarga/levanta y configura SearXNG con Docker (idempotente)."""
     if await _searxng_ready():
         return {"ok": True, "already": True, "url": SEARXNG_URL}
@@ -223,11 +223,37 @@ async def searxng_up():
     if code != 0:
         return {"ok": False, "error": (out or "no se pudo crear el contenedor").strip()[:300]}
 
-    for _ in range(30):  # espera hasta ~60s a que responda JSON
+    for _ in range(wait_cycles):  # espera a que responda JSON
         if await _searxng_ready():
             return {"ok": True, "url": SEARXNG_URL}
         await asyncio.sleep(2)
-    return {"ok": False, "error": "SearXNG arrancó pero aún no responde JSON; reintenta el botón en unos segundos"}
+    return {"ok": False, "error": "SearXNG arrancó pero aún no responde JSON; reintenta en unos segundos"}
+
+
+@app.get("/api/searxng/up")
+async def searxng_up():
+    return await _searxng_bring_up()
+
+
+@app.on_event("startup")
+async def _auto_start_searxng():
+    """Levanta SearXNG solo al iniciar (cero clics). Desactiva con SUBDORK_NO_SEARXNG=1."""
+    if os.environ.get("SUBDORK_NO_SEARXNG") == "1":
+        return
+    if shutil.which("docker") is None:
+        print("[searxng] Docker no disponible; verificación por SearXNG deshabilitada "
+              "(puedes usar Bing).", flush=True)
+        return
+
+    async def _bg():
+        print("[searxng] preparando instancia en segundo plano…", flush=True)
+        res = await _searxng_bring_up(wait_cycles=40)
+        if res.get("ok"):
+            print(f"[searxng] listo en {SEARXNG_URL}", flush=True)
+        else:
+            print(f"[searxng] no se pudo levantar automáticamente: {res.get('error')}", flush=True)
+
+    asyncio.create_task(_bg())
 
 
 @app.get("/api/verify/ping")

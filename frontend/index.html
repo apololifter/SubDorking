@@ -261,8 +261,25 @@ async function init(){
       const t=el.querySelector('.tag'); if(t)t.textContent='no instalado'; else el.insertAdjacentHTML('beforeend',' <span class="tag">no instalado</span>');}};
     mark('s_subfinder',c.tools.subfinder); mark('s_amass',c.tools.amass);
   }catch(e){log('err','config: '+e.message);}
+  pollSearxng(10);   // detecta el auto-arranque de SearXNG y lo selecciona solo
 }
 init();
+
+/* Detecta si SearXNG (auto-arrancado por el backend) ya está listo. */
+async function pollSearxng(tries){
+  try{
+    const s=await fetch('/api/searxng/status').then(r=>r.json());
+    if(s.ready){
+      $('vengine').value='searxng'; $('searxng').disabled=false; $('searxng').value=s.url;
+      $('pingmsg').innerHTML='<span style="color:var(--accent)">✓ SearXNG listo — motor SearXNG seleccionado</span>';
+      return;
+    }
+    if(s.docker && tries>0){
+      $('pingmsg').innerHTML='<span style="color:var(--muted)">SearXNG levantándose en segundo plano… (o pulsa ▶ SearXNG)</span>';
+      setTimeout(()=>pollSearxng(tries-1),5000);
+    }
+  }catch(e){/* silencio */}
+}
 
 document.querySelectorAll('.src').forEach(s=>{const cb=s.querySelector('input');
   cb.addEventListener('change',()=>{s.classList.toggle('on',cb.checked);s.classList.toggle('off',!cb.checked);});});
