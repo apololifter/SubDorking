@@ -25,6 +25,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from dorks import DorkDB
 from recon import enumerate_domain, tool_available
+from verify import ping as searxng_ping, verify_host
 
 BASE = Path(__file__).resolve().parent.parent
 FRONTEND = BASE / "frontend" / "index.html"
@@ -53,6 +54,9 @@ async def api_config():
         {
             "tools": {
                 "crtsh": True,
+                "anubis": True,
+                "alienvault": True,
+                "hackertarget": True,
                 "subfinder": tool_available("subfinder"),
                 "amass": tool_available("amass"),
             },
@@ -146,12 +150,74 @@ async def scan_stream(request: Request):
         depth = max(1, min(4, int(q.get("depth", "1"))))
     except ValueError:
         depth = 1
-    tools = [t for t in (q.get("tools", "crtsh,subfinder").split(",")) if t]
+    tools = [t for t in (q.get("tools", "crtsh,anubis,alienvault,hackertarget,subfinder").split(",")) if t]
     demo = q.get("demo", "0") in ("1", "true", "yes")
 
     params = {"domain": domain, "depth": depth, "tools": tools, "demo": demo}
     return StreamingResponse(
         _run_scan(request, params),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.get("/api/verify/ping")
+async def verify_ping(request: Request):
+    base = request.query_params.get("searxng", "")
+    return JSONResponse(await searxng_ping(base))
+
+
+async def _run_verify(request: Request, host: str, base: str, mx: int, conc: int, delay: float):
+    queue: asyncio.Queue = asyncio.Queue()
+
+    async def emit(ev: dict):
+        await queue.put(ev)
+
+    dorks = list(DORKS.iter_dorks())
+
+    async def worker():
+        try:
+            await verify_host(host, dorks, base, emit, request.is_disconnected,
+                              max_queries=mx, concurrency=conc, delay=delay)
+        except Exception as exc:  # noqa: BLE001
+            await emit({"type": "error", "message": str(exc)})
+        finally:
+            await queue.put(None)
+
+    task = asyncio.create_task(worker())
+    try:
+        while True:
+            ev = await queue.get()
+            if ev is None:
+                break
+            yield _sse(ev)
+    finally:
+        task.cancel()
+
+
+@app.get("/api/verify/stream")
+async def verify_stream(request: Request):
+    q = request.query_params
+    host = (q.get("host") or "").strip().lower()
+    base = (q.get("searxng") or "").strip()
+    if not host or "." not in host:
+        return JSONResponse({"error": "host inválido"}, status_code=400)
+    if not base:
+        return JSONResponse({"error": "falta la URL de SearXNG"}, status_code=400)
+    try:
+        mx = max(1, min(2000, int(q.get("max", "200"))))
+    except ValueError:
+        mx = 200
+    try:
+        conc = max(1, min(8, int(q.get("concurrency", "3"))))
+    except ValueError:
+        conc = 3
+    try:
+        delay = max(0.0, float(q.get("delay", "1.0")))
+    except ValueError:
+        delay = 1.0
+    return StreamingResponse(
+        _run_verify(request, host, base, mx, conc, delay),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

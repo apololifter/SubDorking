@@ -31,8 +31,8 @@ HostCB = Callable[[str], Awaitable[None]]
 
 _DOMAIN_RE = re.compile(r"^[a-z0-9]([a-z0-9\-\.]*[a-z0-9])?\.[a-z]{2,}$")
 
-# Fuentes que no son binarios externos.
-BUILTIN = {"crtsh"}
+# Fuentes que no son binarios externos (HTTP, sin claves).
+BUILTIN = {"crtsh", "anubis", "alienvault", "hackertarget"}
 
 
 def tool_available(name: str) -> bool:
@@ -113,37 +113,106 @@ async def _run_amass(target: str, on_host: HostCB, timeout: int):
     )
 
 
-async def _run_crtsh(target: str, on_host: HostCB, timeout: int):
-    """Consulta Certificate Transparency vía crt.sh (JSON)."""
-    url = f"https://crt.sh/?q=%25.{target}&output=json"
-    try:
-        async with httpx.AsyncClient(
-            timeout=timeout, headers={"User-Agent": "SubDork/1.0"}, follow_redirects=True
-        ) as client:
-            r = await client.get(url)
-            r.raise_for_status()
-            data = r.json()
-    except Exception as exc:  # noqa: BLE001
-        return 0, f"{type(exc).__name__}: {exc}"
+_UA = {"User-Agent": "Mozilla/5.0 (SubDork recon)"}
 
-    hosts: set[str] = set()
-    for row in data if isinstance(data, list) else []:
-        for field in ("name_value", "common_name"):
-            val = row.get(field, "") or ""
-            for piece in str(val).splitlines():
-                h = _clean(piece)
-                if h:
-                    hosts.add(h)
+
+async def _emit_hosts(hosts: set[str], on_host: HostCB) -> int:
     found = 0
     for h in sorted(hosts):
         found += 1
         await on_host(h)
-    return found, None
+    return found
 
 
-RUNNERS = {"crtsh": _run_crtsh, "subfinder": _run_subfinder, "amass": _run_amass}
+async def _get(url: str, timeout: int, retries: int = 2, backoff: float = 1.5):
+    """GET con reintentos ante 502/503/429 y errores de red."""
+    last = None
+    async with httpx.AsyncClient(timeout=timeout, headers=_UA, follow_redirects=True) as c:
+        for attempt in range(retries + 1):
+            try:
+                r = await c.get(url)
+                if r.status_code in (429, 502, 503, 504):
+                    last = f"HTTP {r.status_code}"
+                    await asyncio.sleep(backoff * (attempt + 1))
+                    continue
+                r.raise_for_status()
+                return r, None
+            except Exception as exc:  # noqa: BLE001
+                last = f"{type(exc).__name__}: {exc}"
+                await asyncio.sleep(backoff * (attempt + 1))
+    return None, last or "sin respuesta"
+
+
+async def _run_crtsh(target: str, on_host: HostCB, timeout: int):
+    """Certificate Transparency vía crt.sh (suele dar 502; reintenta)."""
+    r, err = await _get(f"https://crt.sh/?q=%25.{target}&output=json", timeout, retries=3)
+    if r is None:
+        return 0, err
+    try:
+        data = r.json()
+    except Exception:  # noqa: BLE001
+        return 0, "respuesta no-JSON (crt.sh saturado)"
+    hosts: set[str] = set()
+    for row in data if isinstance(data, list) else []:
+        for field in ("name_value", "common_name"):
+            for piece in str(row.get(field, "") or "").splitlines():
+                h = _clean(piece)
+                if h:
+                    hosts.add(h)
+    return await _emit_hosts(hosts, on_host), None
+
+
+async def _run_anubis(target: str, on_host: HostCB, timeout: int):
+    """Anubis DB (jldc.me) — JSON con lista de subdominios."""
+    r, err = await _get(f"https://jldc.me/anubis/subdomains/{target}", timeout)
+    if r is None:
+        return 0, err
+    try:
+        data = r.json()
+    except Exception:  # noqa: BLE001
+        return 0, "respuesta no-JSON"
+    hosts = {h for h in (_clean(x) for x in (data or [])) if h}
+    return await _emit_hosts(hosts, on_host), None
+
+
+async def _run_alienvault(target: str, on_host: HostCB, timeout: int):
+    """AlienVault OTX passive DNS."""
+    r, err = await _get(
+        f"https://otx.alienvault.com/api/v1/indicators/domain/{target}/passive_dns", timeout)
+    if r is None:
+        return 0, err
+    try:
+        data = r.json()
+    except Exception:  # noqa: BLE001
+        return 0, "respuesta no-JSON"
+    hosts = {h for h in (_clean(rec.get("hostname", "")) for rec in data.get("passive_dns", [])) if h}
+    return await _emit_hosts(hosts, on_host), None
+
+
+async def _run_hackertarget(target: str, on_host: HostCB, timeout: int):
+    """HackerTarget hostsearch (texto 'host,ip'). Tiene límite diario."""
+    r, err = await _get(f"https://api.hackertarget.com/hostsearch/?q={target}", timeout)
+    if r is None:
+        return 0, err
+    text = r.text.strip()
+    low = text.lower()
+    if not text or "api count exceeded" in low or "error" in low[:40]:
+        return 0, "límite diario alcanzado" if "count" in low else (text[:60] or "sin datos")
+    hosts = {h for h in (_clean(line.split(",")[0]) for line in text.splitlines()) if h}
+    return await _emit_hosts(hosts, on_host), None
+
+
+RUNNERS = {
+    "crtsh": _run_crtsh,
+    "anubis": _run_anubis,
+    "alienvault": _run_alienvault,
+    "hackertarget": _run_hackertarget,
+    "subfinder": _run_subfinder,
+    "amass": _run_amass,
+}
 # timeout por fuente (segundos)
-TIMEOUTS = {"crtsh": 40, "subfinder": 90, "amass": 150}
+TIMEOUTS = {"crtsh": 40, "anubis": 25, "alienvault": 25, "hackertarget": 25,
+            "subfinder": 90, "amass": 150}
 
 
 # --------------------------- enumeración ----------------------------------
