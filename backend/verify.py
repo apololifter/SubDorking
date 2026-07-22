@@ -67,19 +67,52 @@ async def _search_searxng(client: httpx.AsyncClient, base: str, query: str) -> l
     return [(x or {}).get("url") for x in (data.get("results") or [])]
 
 
-_ENGINES = {"bing": _search_bing, "duckduckgo": _search_duckduckgo, "searxng": _search_searxng}
+_SERPER_URL = "https://google.serper.dev/search"
 
 
-async def ping(engine: str, base_url: str = "", timeout: int = 12) -> dict:
+async def _search_serper(client: httpx.AsyncClient, base: str, query: str) -> list[str]:
+    """Serper.dev — API gestionada sobre Google (proxies+captcha resueltos por ellos).
+
+    La API key va en la cabecera X-API-KEY (se fija en el cliente; ver verify_host/ping).
+    Cada consulta consume 1 crédito. Resultados en organic[].link.
+    """
+    r = await client.post(_SERPER_URL, json={"q": query, "num": 10, "gl": "us", "hl": "en"})
+    if r.status_code in (401, 403):
+        raise RuntimeError(f"Serper: API key inválida o sin permiso (HTTP {r.status_code})")
+    if r.status_code == 402:
+        raise RuntimeError("Serper: sin créditos (402); recarga en tu panel o espera")
+    if r.status_code == 429:
+        raise RuntimeError("Serper: límite de tasa (429); baja la concurrencia o sube el delay")
+    r.raise_for_status()
+    data = r.json()
+    return [(x or {}).get("link") for x in (data.get("organic") or []) if (x or {}).get("link")]
+
+
+_ENGINES = {"bing": _search_bing, "duckduckgo": _search_duckduckgo,
+            "searxng": _search_searxng, "serper": _search_serper}
+
+
+def _client_headers(engine: str, api_key: str = "") -> dict:
+    """Cabeceras del cliente HTTP; Serper añade su API key."""
+    headers = dict(_UA)
+    if engine == "serper" and api_key:
+        headers["X-API-KEY"] = api_key.strip()
+    return headers
+
+
+async def ping(engine: str, base_url: str = "", api_key: str = "", timeout: int = 12) -> dict:
     """Comprueba que el motor de verificación responde."""
     engine = engine or "bing"
     if engine not in _ENGINES:
         return {"ok": False, "error": f"motor desconocido: {engine}"}
     if engine == "searxng" and not (base_url or "").strip():
         return {"ok": False, "error": "falta la URL de SearXNG"}
+    if engine == "serper" and not (api_key or "").strip():
+        return {"ok": False, "error": "falta la API key de Serper"}
     base = (base_url or "").strip().rstrip("/")
+    headers = _client_headers(engine, api_key)
     try:
-        async with httpx.AsyncClient(timeout=timeout, headers=_UA, follow_redirects=True) as c:
+        async with httpx.AsyncClient(timeout=timeout, headers=headers, follow_redirects=True) as c:
             await _ENGINES[engine](c, base, "site:example.com")
     except httpx.ConnectError:
         where = base or "el motor"
@@ -101,6 +134,7 @@ async def verify_host(
     on_event: EventCB,
     engine: str = "bing",
     base_url: str = "",
+    api_key: str = "",
     is_disconnected: Callable[[], Awaitable[bool]] | None = None,
     max_queries: int = 150,
     concurrency: int = 3,
@@ -111,6 +145,10 @@ async def verify_host(
     search = _ENGINES.get(engine)
     if search is None:
         await on_event({"type": "verify_error", "host": host, "message": f"motor desconocido: {engine}"})
+        await on_event({"type": "verify_done", "host": host, "checked": 0, "hits": 0, "errored": True})
+        return
+    if engine == "serper" and not (api_key or "").strip():
+        await on_event({"type": "verify_error", "host": host, "message": "falta la API key de Serper"})
         await on_event({"type": "verify_done", "host": host, "checked": 0, "hits": 0, "errored": True})
         return
 
@@ -125,7 +163,8 @@ async def verify_host(
     stop = False
     errored = False
 
-    async with httpx.AsyncClient(timeout=25, headers=_UA, follow_redirects=True) as client:
+    headers = _client_headers(engine, api_key)
+    async with httpx.AsyncClient(timeout=25, headers=headers, follow_redirects=True) as client:
 
         # Prueba base: 'site:host' debería devolver resultados si el motor funciona
         # y el host está indexado. Si da 0, el problema es el motor, no los dorks.
@@ -176,8 +215,9 @@ async def verify_host(
                         "count": len(results),
                         "top": results[0] if results else None,
                     })
-                if checked % 5 == 0:
-                    await on_event({"type": "verify_progress", "host": host, "done": checked, "hits": hits})
+                # progreso en cada consulta para que la barra avance suave
+                await on_event({"type": "verify_progress", "host": host,
+                                "done": checked, "total": total, "hits": hits})
                 if delay > 0:
                     await asyncio.sleep(delay)
 

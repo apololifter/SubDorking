@@ -261,11 +261,13 @@ async def verify_ping(request: Request):
     q = request.query_params
     engine = q.get("engine", "bing")
     base = q.get("searxng", "")
-    return JSONResponse(await searxng_ping(engine, base))
+    api_key = q.get("apikey", "")
+    return JSONResponse(await searxng_ping(engine, base, api_key))
 
 
 async def _run_verify(request: Request, host: str, engine: str, base: str,
-                      mx: int, conc: int, delay: float, category: str = ""):
+                      mx: int, conc: int, delay: float, category: str = "",
+                      api_key: str = ""):
     queue: asyncio.Queue = asyncio.Queue()
 
     async def emit(ev: dict):
@@ -278,6 +280,7 @@ async def _run_verify(request: Request, host: str, engine: str, base: str,
     async def worker():
         try:
             await verify_host(host, dorks, emit, engine=engine, base_url=base,
+                              api_key=api_key,
                               is_disconnected=request.is_disconnected,
                               max_queries=mx, concurrency=conc, delay=delay)
         except Exception as exc:  # noqa: BLE001
@@ -302,10 +305,13 @@ async def verify_stream(request: Request):
     host = (q.get("host") or "").strip().lower()
     engine = q.get("engine", "bing")
     base = (q.get("searxng") or "").strip()
+    api_key = (q.get("apikey") or "").strip()
     if not host or "." not in host:
         return JSONResponse({"error": "host inválido"}, status_code=400)
     if engine == "searxng" and not base:
         return JSONResponse({"error": "falta la URL de SearXNG"}, status_code=400)
+    if engine == "serper" and not api_key:
+        return JSONResponse({"error": "falta la API key de Serper"}, status_code=400)
     try:
         mx = max(1, min(2000, int(q.get("max", "150"))))
     except ValueError:
@@ -320,7 +326,7 @@ async def verify_stream(request: Request):
         delay = 1.0
     category = q.get("category", "")
     return StreamingResponse(
-        _run_verify(request, host, engine, base, mx, conc, delay, category),
+        _run_verify(request, host, engine, base, mx, conc, delay, category, api_key),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
