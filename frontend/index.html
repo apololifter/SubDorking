@@ -172,8 +172,10 @@
         Con la versión gratuita, mantén "Máx." bajo (p.ej. 10) para no gastar de más.</p>
       <div><label>Motor</label>
         <select id="vengine"><option value="bing">Bing</option><option value="duckduckgo">DuckDuckGo</option><option value="searxng">SearXNG</option><option value="serper">Serper (Google)</option></select></div>
-      <div><label>URL de SearXNG</label><input id="searxng" type="url" placeholder="http://localhost:8888" disabled /></div>
-      <div><label>API key de Serper</label><input id="serperkey" type="password" placeholder="tu X-API-KEY" autocomplete="off" disabled /></div>
+      <div>
+        <div id="cell-searxng"><label>URL de SearXNG</label><input id="searxng" type="url" placeholder="http://localhost:8888" disabled /></div>
+        <div id="cell-serper" style="display:none"><label>API key de Serper</label><input id="serperkey" type="password" placeholder="tu X-API-KEY" autocomplete="off" disabled /></div>
+      </div>
       <div><label>Máx.</label><input id="vmax" type="number" min="1" value="40" /></div>
       <div><label>Concurr.</label><input id="vconc" type="number" min="1" max="8" value="1" /></div>
       <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="2" /></div>
@@ -247,13 +249,13 @@
         <span class="chip has" id="hit_count">0</span>
       </div>
       <div class="colbody" id="findings">
-        <div class="cat-empty">Aquí aparecerán los dorks que SearXNG confirme con resultados.</div>
+        <div class="cat-empty">Aquí aparecerán los dorks que el motor confirme con resultados.</div>
       </div>
     </div>
   </div>
 </main>
 
-<footer>SubDork · <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías · verificación vía Bing / SearXNG · uso autorizado</footer>
+<footer>SubDork · <b id="f_dorks">…</b> dorks en <b id="f_cats">…</b> categorías · verificación vía Bing / SearXNG / Serper · uso autorizado</footer>
 
 <script>
 const $=(id)=>document.getElementById(id);
@@ -437,7 +439,7 @@ function handleScan(ev){
 function stopES(){if(es){es.close();es=null;}$('go').textContent='▶ Escanear';$('go').classList.remove('scanning');}
 function stop(){if(es){stopES();setState('detenido',false);}}
 
-/* ---------- VERIFICACIÓN SEARXNG ---------- */
+/* ---------- VERIFICACIÓN DE HALLAZGOS ---------- */
 function updateVerifyBtn(host){
   const rec=endpoints.get(host); const b=$('verifyBtn');
   if(!rec)return;
@@ -481,9 +483,9 @@ function handleVerify(ev){
       if(ev.host===selected){
         $('vprog').innerHTML = ev.count>0
           ? `prueba base <code>site:${esc(ev.host)}</code> → <b style="color:var(--accent)">${ev.count}</b> resultados · verificando dorks…`
-          : `<span style="color:var(--warn)">prueba base <code>site:${esc(ev.host)}</code> → 0 · el motor no devuelve resultados (revisa SearXNG en http://localhost:8888)</span>`;
+          : `<span style="color:var(--warn)">prueba base <code>site:${esc(ev.host)}</code> → 0 · el motor no devuelve resultados (revisa la conexión del motor)</span>`;
       }
-      log(ev.count>0?'ok':'warn',`prueba base site:${ev.host} → ${ev.count} resultados`+(ev.count>0?' (SearXNG OK)':' (motor sin resultados)'));
+      log(ev.count>0?'ok':'warn',`prueba base site:${ev.host} → ${ev.count} resultados`+(ev.count>0?' (motor OK)':' (motor sin resultados)'));
       break;
     case 'verify_progress':setVBar(ev.done, ev.total||0, 'run');if(ev.host===selected)$('vprog').textContent=`${ev.done} · ${ev.hits} hallazgos`;break;
     case 'dork_hit':
@@ -504,7 +506,7 @@ function handleVerify(ev){
 function stopVerify(){if(ves){ves.close();ves=null;} if(selected){const r=endpoints.get(selected);if(r)r.verifying=false;updateVerifyBtn(selected);} log('warn','verificación detenida');}
 function finishVerify(host){if(ves){ves.close();ves=null;} const r=endpoints.get(host);if(r)r.verifying=false; if(host===selected)updateVerifyBtn(host);}
 
-/* ---------- ping SearXNG ---------- */
+/* ---------- probar motor de verificación ---------- */
 async function pingSearxng(){
   const engine=$('vengine').value;
   const base=$('searxng').value.trim();
@@ -565,12 +567,14 @@ $('domain').addEventListener('keydown',e=>{if(e.key==='Enter')start();});
 $('verifyBtn').addEventListener('click',()=>{if(selected)verifyHost(selected);});
 $('ping').addEventListener('click',pingSearxng);
 
-// motor: habilita URL solo para SearXNG y API key solo para Serper
+// motor: muestra la celda de credencial correcta (URL SearXNG o API key Serper)
 $('vengine').addEventListener('change',()=>{
   const eng=$('vengine').value;
   const isSx=eng==='searxng', isSp=eng==='serper';
   $('searxng').disabled=!isSx;
   $('serperkey').disabled=!isSp;
+  $('cell-searxng').style.display=isSp?'none':'block';
+  $('cell-serper').style.display=isSp?'block':'none';
   if(isSx&&!$('searxng').value) $('searxng').value='http://localhost:8888';
   // con Serper (plan gratis) arranca con Máx bajo para no gastar créditos
   if(isSp && parseInt($('vmax').value)>10) $('vmax').value=10;
