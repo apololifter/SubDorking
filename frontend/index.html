@@ -141,6 +141,27 @@
 
   footer{color:var(--muted);font-size:11px;text-align:center;padding:20px}
   code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--accent)}
+
+  /* ---- feedback visual (táctil, estados, pulsos) ---- */
+  .btn,.mini,.src{transition:transform .08s ease,border-color .12s ease,background .12s ease,color .12s ease}
+  .btn:active,.mini:active,.src:active{transform:scale(.96)}
+  .btn:disabled{opacity:.55;cursor:progress}
+  .mini.active{border-color:var(--accent);color:var(--accent)}
+  .mini.busy{opacity:.6;cursor:progress}
+  select:hover{border-color:var(--accent2)}
+  input[type=number]:focus{border-color:var(--accent)}
+  .ep{transition:border-color .12s ease,background .12s ease}
+  .dork.clicked{border-color:var(--border);background:#131b25}
+  .dork.clicked .q{opacity:.6}
+  @keyframes flash-ok{0%{background:var(--accent);color:#062018;border-color:var(--accent)}
+    100%{background:var(--panel2);color:var(--txt)}}
+  .flash-ok{animation:flash-ok .9s ease}
+  @keyframes flash-err{0%{background:var(--err);color:#2a0810;border-color:var(--err)}
+    100%{background:var(--panel2);color:var(--txt)}}
+  .flash-err{animation:flash-err .9s ease}
+  .readout{font-size:11px;color:var(--muted);white-space:nowrap}
+  .readout b{color:var(--accent)}
+  .filter-empty{color:var(--muted);font-size:12px;padding:14px 6px;text-align:center}
 </style>
 </head>
 <body>
@@ -172,21 +193,23 @@
     <div class="verifybar">
       <p class="full">Verificación de hallazgos (opcional): <b>Bing</b> funciona sin instalar nada (tolera mejor el
         scraping); <b>DuckDuckGo</b> bloquea rápido; <b>SearXNG</b> (tu instancia) es robusto y gratis;
-        <b>Serper (Google)</b> es API gestionada (sin captcha ni bloqueos) — consume créditos, ~$0.30/1k.
-        Con la versión gratuita, mantén "Máx." bajo (p.ej. 10) para no gastar de más.</p>
+        <b>Serper (Google)</b> es API gestionada (sin captcha ni bloqueos) — 1 crédito por dork, el plan
+        free trae 2.500. No necesita delay; al elegirlo se ajusta solo (Máx 1000, delay 0) y verás el
+        consumo estimado antes de lanzar.</p>
       <div><label>Motor</label>
         <select id="vengine"><option value="bing">Bing</option><option value="duckduckgo">DuckDuckGo</option><option value="searxng">SearXNG</option><option value="serper">Serper (Google)</option></select></div>
       <div>
         <div id="cell-searxng"><label>URL de SearXNG</label><input id="searxng" type="url" placeholder="http://localhost:8888" disabled /></div>
         <div id="cell-serper" style="display:none"><label>API key de Serper</label><input id="serperkey" type="password" placeholder="tu X-API-KEY" autocomplete="off" disabled /></div>
       </div>
-      <div><label>Máx.</label><input id="vmax" type="number" min="1" value="40" /></div>
+      <div><label>Máx.</label><input id="vmax" type="number" min="1" max="2000" value="40" /></div>
       <div><label>Concurr.</label><input id="vconc" type="number" min="1" max="8" value="1" /></div>
       <div><label>Delay (s)</label><input id="vdelay" type="number" min="0" step="0.5" value="2" /></div>
       <div style="display:flex;gap:6px">
         <button id="sxup" class="btn btn-ping" title="descarga, levanta y configura SearXNG con Docker (un clic)">▶ SearXNG</button>
         <button id="ping" class="btn btn-ping">probar</button>
       </div>
+      <div class="full readout" id="serperest" style="display:none"></div>
       <div class="full" id="vbarwrap" style="display:none">
         <div class="vbar-head"><span id="vbarlabel">0 / 0</span><span id="vbarpct">0%</span></div>
         <div class="vbar"><div class="vbar-fill" id="vbarfill"></div></div>
@@ -273,6 +296,19 @@ const buildQuery=(h,d)=> /\bsite:/i.test(d) ? d : `site:${h} ${d}`;
 const googleUrl=(h,d)=>"https://www.google.com/search?q="+encodeURIComponent(buildQuery(h,d));
 const esc=(s)=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmtDork=(q)=>esc(q).replace(/\b(site|intitle|inurl|intext|filetype|ext|allintext|allinurl|allintitle|cache|link|related|inanchor|numrange):/g,'<span class="op">$1:</span>');
+/* pulso de feedback (verde=ok, rojo=error) en cualquier elemento */
+function flash(el,ok){ if(!el)return; el.classList.remove('flash-ok','flash-err'); void el.offsetWidth;
+  el.classList.add(ok?'flash-ok':'flash-err'); setTimeout(()=>el.classList.remove('flash-ok','flash-err'),900); }
+/* filtra el catálogo a la categoría elegida en el selector de verificación */
+function applyCatFilter(){
+  const sel=$('vcat').value, box=$('catalog'); if(!box)return;
+  box.querySelectorAll('.cat').forEach(c=>{
+    const name=c.querySelector('.cname').textContent;
+    const match=(sel==='all')||name===sel;
+    c.style.display=match?'':'none';
+    if(sel!=='all'&&match) c.classList.add('open');
+  });
+}
 
 async function init(){
   try{
@@ -366,7 +402,12 @@ function renderCatalog(host){
       c.querySelectorAll('.dork').forEach(d=>{const show=!q||d.textContent.toLowerCase().includes(q)||name.includes(q);d.style.display=show?'':'none';if(show)any=true;});
       c.style.display=(any||!q)?'':'none';if(q&&any)c.classList.add('open');});});
   tools.querySelectorAll('.mini').forEach(b=>b.addEventListener('click',()=>{
-    const open=b.dataset.a==='expand';list.querySelectorAll('.cat').forEach(c=>c.classList.toggle('open',open));}));
+    const open=b.dataset.a==='expand';list.querySelectorAll('.cat').forEach(c=>c.classList.toggle('open',open));
+    flash(b,true);}));
+  // marca visualmente los dorks ya abiertos en Google
+  box.addEventListener('click',e=>{const a=e.target.closest('.dork');if(a)a.classList.add('clicked');});
+  // respeta la categoría elegida en el selector de verificación
+  applyCatFilter();
 }
 
 /* ---------- hallazgos (panel derecho, tabla) ---------- */
@@ -521,12 +562,16 @@ async function pingSearxng(){
   const engine=$('vengine').value;
   const base=$('searxng').value.trim();
   const skey=$('serperkey').value.trim();
+  const btn=$('ping'); const old=btn.textContent;
+  btn.disabled=true; btn.classList.add('busy'); btn.textContent='probando…';
   $('pingmsg').innerHTML='<span style="color:var(--muted)">probando…</span>';
   try{
     const r=await fetch(`/api/verify/ping?engine=${engine}&searxng=${encodeURIComponent(base)}&apikey=${encodeURIComponent(skey)}`).then(x=>x.json());
     $('pingmsg').innerHTML=r.ok?`<span style="color:var(--accent)">✓ ${engine} responde</span>`
       :'<span style="color:var(--err)">✗ '+esc(r.error)+'</span>';
-  }catch(e){$('pingmsg').innerHTML='<span style="color:var(--err)">✗ '+esc(e.message)+'</span>';}
+    flash(btn, !!r.ok);
+  }catch(e){$('pingmsg').innerHTML='<span style="color:var(--err)">✗ '+esc(e.message)+'</span>';flash(btn,false);}
+  finally{ btn.disabled=false; btn.classList.remove('busy'); btn.textContent=old; }
 }
 
 /* ---------- agregar subdominios manual / .txt / filtro ---------- */
@@ -544,11 +589,22 @@ function addManualHosts(text){
 }
 function toggleAddRow(){
   const r=$('addrow'); const show=r.style.display==='none';
-  r.style.display=show?'block':'none'; if(show)$('addinput').focus();
+  r.style.display=show?'block':'none';
+  $('addBtn').classList.toggle('active',show);
+  if(show)$('addinput').focus();
 }
 function filterSidebar(){
   const q=$('epfilter').value.toLowerCase();
-  endpoints.forEach((rec,host)=>{ rec.item.style.display=(!q||host.includes(q))?'':'none'; });
+  let shown=0;
+  endpoints.forEach((rec,host)=>{ const vis=(!q||host.includes(q)); rec.item.style.display=vis?'':'none'; if(vis)shown++; });
+  // contador en vivo en el chip
+  $('ep_count').textContent = q ? `${shown}/${endpoints.size}` : endpoints.size;
+  // mensaje si el filtro no encuentra nada
+  let em=$('filter-empty'); const sb=$('sidebar');
+  if(q && shown===0){
+    if(!em){ em=document.createElement('div'); em.id='filter-empty'; em.className='filter-empty'; sb.appendChild(em); }
+    em.textContent=`sin coincidencias para “${q}”`; em.style.display='block';
+  } else if(em){ em.style.display='none'; }
 }
 
 /* ---------- levantar SearXNG con un clic ---------- */
@@ -586,27 +642,47 @@ $('vengine').addEventListener('change',()=>{
   $('cell-searxng').style.display=isSp?'none':'block';
   $('cell-serper').style.display=isSp?'block':'none';
   if(isSx&&!$('searxng').value) $('searxng').value='http://localhost:8888';
-  // con Serper (plan gratis) arranca con Máx bajo para no gastar créditos
-  if(isSp && parseInt($('vmax').value)>10) $('vmax').value=10;
+  // Serper no bloquea: sin delay, más concurrencia y, si venías de scraping, sube a 1000
+  if(isSp){ $('vdelay').value='0';
+    if((parseInt($('vmax').value)||0)<50) $('vmax').value='1000';
+    if((parseInt($('vconc').value)||1)<3) $('vconc').value='5'; }
+  $('serperest').style.display=isSp?'block':'none';
+  updateSerperEst();
   // nota de plan free: intext:/allintext: no están permitidos y se omiten solos
   if(isSp) $('pingmsg').innerHTML='<span style="color:var(--muted)">plan free: los dorks <code>intext:</code>/<code>allintext:</code> se omiten automáticamente</span>';
   else $('pingmsg').textContent='';
 });
+// estimador de créditos de Serper, en vivo al cambiar Máx
+function updateSerperEst(){
+  const el=$('serperest'); if(!el) return;
+  if($('vengine').value!=='serper'){ el.style.display='none'; return; }
+  const n=Math.max(1, parseInt($('vmax').value)||0);
+  el.style.display='block';
+  el.innerHTML=`consumo estimado: <b>≈ ${n.toLocaleString('es')} créditos</b> · 1 por dork `
+    +`(≈11% <code>intext:</code>/<code>allintext:</code> se omiten sin costo) · el plan free trae 2.500`;
+}
+$('vmax').addEventListener('input',updateSerperEst);
 
 // agregar subdominios a mano
 $('addBtn').addEventListener('click',toggleAddRow);
 $('addinput').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){ if(addManualHosts($('addinput').value)>0){$('addinput').value='';} }
+  if(e.key==='Enter'){ const n=addManualHosts($('addinput').value);
+    if(n>0){ $('addinput').value=''; flash($('addinput'),true); } else { flash($('addinput'),false); } }
 });
 // subir .txt
 $('epfile').addEventListener('change',e=>{
   const f=e.target.files&&e.target.files[0]; if(!f)return;
   const rd=new FileReader();
-  rd.onload=()=>{ const n=addManualHosts(rd.result); log('info',`.txt "${f.name}": ${n} subdominio(s) agregados`); };
+  rd.onload=()=>{ const n=addManualHosts(rd.result); log('info',`.txt "${f.name}": ${n} subdominio(s) agregados`); flash($('fileLbl'), n>0); };
   rd.readAsText(f); e.target.value='';
 });
 // filtro del sidebar
 $('epfilter').addEventListener('input',filterSidebar);
+// selector de categoría a verificar: filtra el catálogo y avisa
+$('vcat').addEventListener('change',()=>{ applyCatFilter();
+  const sel=$('vcat').value;
+  log('info', sel==='all'?'categoría: todas':'categoría: '+sel);
+});
 </script>
 </body>
 </html>
