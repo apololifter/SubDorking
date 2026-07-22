@@ -70,6 +70,14 @@ async def _search_searxng(client: httpx.AsyncClient, base: str, query: str) -> l
 _SERPER_URL = "https://google.serper.dev/search"
 
 
+class SkipDork(Exception):
+    """El motor rechaza este dork puntual (no toda la corrida).
+
+    Caso típico: el plan gratis de Serper no permite ciertos operadores
+    (intext:/allintext:). Se salta ese dork y se continúa con el resto.
+    """
+
+
 async def _search_serper(client: httpx.AsyncClient, base: str, query: str) -> list[str]:
     """Serper.dev — API gestionada sobre Google (proxies+captcha resueltos por ellos).
 
@@ -82,13 +90,16 @@ async def _search_serper(client: httpx.AsyncClient, base: str, query: str) -> li
             body = r.text[:200].replace("\n", " ").strip()
         except Exception:  # noqa: BLE001
             body = ""
+        # Plan gratis: 'Query pattern not allowed' (intext:/allintext:). Se salta, no es fatal.
+        if r.status_code == 400 and "not allowed" in body.lower():
+            raise SkipDork("patrón no permitido en el plan free de Serper (intext:/allintext:)")
         if r.status_code in (401, 403):
             raise RuntimeError(f"Serper: API key inválida o sin permiso (HTTP {r.status_code}) {body}")
         if r.status_code == 402:
             raise RuntimeError(f"Serper: sin créditos (402); recarga en tu panel. {body}")
         if r.status_code == 429:
             raise RuntimeError("Serper: límite de tasa (429); baja la concurrencia o sube el delay")
-        # 400 u otros: el cuerpo de Serper explica el motivo real
+        # otros 400/5xx: el cuerpo de Serper explica el motivo real
         raise RuntimeError(f"Serper HTTP {r.status_code}: {body}")
     data = r.json()
     return [(x or {}).get("link") for x in (data.get("organic") or []) if (x or {}).get("link")]
@@ -166,6 +177,7 @@ async def verify_host(
     sem = asyncio.Semaphore(max(1, concurrency))
     checked = 0
     hits = 0
+    skipped = 0
     stop = False
     errored = False
 
@@ -190,7 +202,7 @@ async def verify_host(
             return
 
         async def one(category: str, dork: str):
-            nonlocal checked, hits, stop, errored
+            nonlocal checked, hits, skipped, stop, errored
             if stop:
                 return
             async with sem:
@@ -202,6 +214,15 @@ async def verify_host(
                 query = build_query(host, dork)
                 try:
                     results = await search(client, base, query)
+                except SkipDork:
+                    # dork puntual rechazado por el plan (intext:/allintext:): saltar y seguir
+                    skipped += 1
+                    await on_event({"type": "verify_progress", "host": host,
+                                    "done": checked + skipped, "total": total,
+                                    "hits": hits, "skipped": skipped})
+                    if delay > 0:
+                        await asyncio.sleep(delay)
+                    return
                 except Exception as exc:  # noqa: BLE001
                     if not stop:
                         stop = True
@@ -223,10 +244,12 @@ async def verify_host(
                     })
                 # progreso en cada consulta para que la barra avance suave
                 await on_event({"type": "verify_progress", "host": host,
-                                "done": checked, "total": total, "hits": hits})
+                                "done": checked + skipped, "total": total,
+                                "hits": hits, "skipped": skipped})
                 if delay > 0:
                     await asyncio.sleep(delay)
 
         await asyncio.gather(*(one(c, d) for c, d in subset))
 
-    await on_event({"type": "verify_done", "host": host, "checked": checked, "hits": hits, "errored": errored})
+    await on_event({"type": "verify_done", "host": host, "checked": checked,
+                    "hits": hits, "skipped": skipped, "errored": errored})

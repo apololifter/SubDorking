@@ -487,7 +487,7 @@ function handleVerify(ev){
       }
       log(ev.count>0?'ok':'warn',`prueba base site:${ev.host} → ${ev.count} resultados`+(ev.count>0?' (motor OK)':' (motor sin resultados)'));
       break;
-    case 'verify_progress':setVBar(ev.done, ev.total||0, 'run');if(ev.host===selected)$('vprog').textContent=`${ev.done} · ${ev.hits} hallazgos`;break;
+    case 'verify_progress':setVBar(ev.done, ev.total||0, 'run');if(ev.host===selected)$('vprog').textContent=`${ev.done} · ${ev.hits} hallazgos`+(ev.skipped?` · ${ev.skipped} omitidos`:'');break;
     case 'dork_hit':
       if(rec){rec.hits.push(ev);
         const b=rec.item.querySelector('.badge');b.textContent=rec.hits.length;b.classList.add('has');}
@@ -495,11 +495,13 @@ function handleVerify(ev){
       log('ok',`  ! hallazgo [${ev.category}] ${ev.host}`);break;
     case 'verify_error':log('err','verificación: '+ev.message);
       $('pingmsg').innerHTML='<span style="color:var(--err)">'+esc(ev.message)+'</span>';break;
-    case 'verify_done':
+    case 'verify_done':{
+      const _tot=(ev.checked||0)+(ev.skipped||0);
       if(ev.errored){setVBar(ev.checked, ev.checked||1, 'err');$('vprog').innerHTML='<span style="color:var(--err)">verificación detenida por error</span>';}
-      else{setVBar(ev.checked, ev.checked, 'done');$('vprog').textContent=`✓ ${ev.checked} revisados · ${ev.hits} hallazgos`;
-        log('ok',`verificación de ${ev.host} lista: ${ev.hits}/${ev.checked}`);}
-      if(rec)rec.verified=!ev.errored; finishVerify(ev.host);break;
+      else{setVBar(_tot, _tot, 'done');
+        $('vprog').textContent=`✓ ${ev.checked} revisados · ${ev.hits} hallazgos`+(ev.skipped?` · ${ev.skipped} omitidos (plan free: intext:/allintext:)`:'');
+        log('ok',`verificación de ${ev.host} lista: ${ev.hits} hallazgos / ${ev.checked} revisados`+(ev.skipped?` · ${ev.skipped} omitidos`:''));}
+      if(rec)rec.verified=!ev.errored; finishVerify(ev.host);break;}
     case 'error':log('err',ev.message);finishVerify(ev.host);break;
   }
 }
