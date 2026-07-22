@@ -162,6 +162,11 @@
   .readout{font-size:11px;color:var(--muted);white-space:nowrap}
   .readout b{color:var(--accent)}
   .filter-empty{color:var(--muted);font-size:12px;padding:14px 6px;text-align:center}
+  .ep-del{margin-left:2px;background:transparent;border:none;color:var(--muted);cursor:pointer;
+    font-size:15px;line-height:1;padding:0 5px;border-radius:5px;opacity:.5;
+    transition:opacity .12s ease,color .12s ease,background .12s ease}
+  .ep-del:hover{color:var(--err);background:#2a1420;opacity:1}
+  .ep .badge.alive{color:var(--accent);border-color:#1c3a2c}
 </style>
 </head>
 <body>
@@ -187,7 +192,8 @@
       <label class="src on" id="s_hackertarget"><input type="checkbox" checked /> hackertarget</label>
       <label class="src on" id="s_subfinder"><input type="checkbox" checked /> subfinder</label>
       <label class="src off" id="s_amass"><input type="checkbox" /> amass <span class="tag">lento</span></label>
-      <label class="src off" id="s_demo" style="margin-left:auto"><input type="checkbox" /> demo <span class="tag">sin instalar</span></label>
+      <label class="src off" id="s_alive" style="margin-left:auto" title="verifica que cada subdominio responda por HTTP; agrega a la lista solo los que responden (más lento)"><input type="checkbox" /> solo activos <span class="tag">responden</span></label>
+      <label class="src off" id="s_demo"><input type="checkbox" /> demo <span class="tag">sin instalar</span></label>
     </div>
 
     <div class="verifybar">
@@ -227,6 +233,7 @@
     <span class="pill"><span class="k">nivel</span> <b id="st_level">—</b></span>
     <span class="pill"><span class="k">fuente</span> <b id="st_src">—</b></span>
     <span class="pill"><span class="k">dorks base</span> <b id="st_dorks">—</b></span>
+    <span class="pill" style="display:none"><span class="k">descartados</span> <b id="st_dead">0</b></span>
   </div>
 
   <details class="console" id="console">
@@ -290,6 +297,7 @@ let DORKS={categories:[],total:0};
 let es=null, ves=null;
 const endpoints=new Map();   // host -> {item, level, source, hits:[], verified, verifying}
 let selected=null;
+let deadCount=0;   // subdominios descartados por no responder (modo 'solo activos')
 
 /* consulta google (espejo de dorks.py) */
 const buildQuery=(h,d)=> /\bsite:/i.test(d) ? d : `site:${h} ${d}`;
@@ -355,20 +363,44 @@ function setState(txt,live){$('status').classList.add('show');
   $('st_state').innerHTML=(live?'<span class="spinner"></span> ':'')+esc(txt);}
 
 /* ---------- sidebar de endpoints ---------- */
-function addEndpoint(host,level,source){
+function addEndpoint(host,level,source,status){
   if(endpoints.has(host)) return endpoints.get(host);
   const first=endpoints.size===0;
   const sb=$('sidebar'); if(first) sb.innerHTML='';
   const item=document.createElement('div'); item.className='ep';
   const lbl=(level==='M')?'man':('N'+level);
-  item.innerHTML=`<span class="h">${esc(host)}</span><span class="lvl">${lbl}</span><span class="badge" title="hallazgos">0</span>`;
+  const badgeCls=status?'badge alive':'badge';
+  const badgeTitle=status?`responde HTTP ${status}`:'hallazgos';
+  item.innerHTML=`<span class="h">${esc(host)}</span><span class="lvl">${lbl}</span>`+
+    `<span class="${badgeCls}" title="${badgeTitle}">0</span>`+
+    `<button class="ep-del" title="eliminar de la lista" aria-label="eliminar">×</button>`;
   item.addEventListener('click',()=>selectEndpoint(host));
+  item.querySelector('.ep-del').addEventListener('click',e=>{e.stopPropagation();removeEndpoint(host);});
   sb.appendChild(item);
   const rec={item,level,source,hits:[],verified:false,verifying:false};
   endpoints.set(host,rec);
   $('ep_count').textContent=endpoints.size; $('st_subs').textContent=endpoints.size;
   if(first) selectEndpoint(host);
   return rec;
+}
+function removeEndpoint(host){
+  const rec=endpoints.get(host); if(!rec) return;
+  rec.item.remove(); endpoints.delete(host);
+  $('ep_count').textContent=endpoints.size; $('st_subs').textContent=endpoints.size;
+  log('info',`endpoint eliminado: ${host}`);
+  if(selected===host){
+    selected=null;
+    const next=endpoints.keys().next().value;
+    if(next){ selectEndpoint(next); }
+    else{
+      $('cat_host').textContent='—'; $('hit_count').textContent='0'; $('verifyBtn').disabled=true;
+      $('catalog').innerHTML='<div class="cat-empty">Selecciona un endpoint en la izquierda para ver su catálogo de dorks.</div>';
+      $('findings').innerHTML='<div class="cat-empty">Aquí aparecerán los dorks que el motor confirme con resultados.</div>';
+    }
+  }
+  if(endpoints.size===0){
+    $('sidebar').innerHTML='<div class="sidebar-empty">Escanea un dominio, o agrega subdominios con <b>＋</b> / <b>⬆ .txt</b>.</div>';
+  }
 }
 function selectEndpoint(host){
   selected=host;
@@ -440,10 +472,11 @@ function start(){
   const domain=$('domain').value.trim().toLowerCase().replace(/^\*+\.?/,'');
   if(!domain||!domain.includes('.')){$('domain').focus();log('warn','ingresa un dominio válido');return;}
   const demo=$('s_demo').querySelector('input').checked;
+  const alive=$('s_alive').querySelector('input').checked;
   const tools=selectedTools();
   if(!demo&&tools.length===0){log('warn','selecciona al menos una fuente o activa demo');return;}
   stop();
-  endpoints.clear(); selected=null;
+  endpoints.clear(); selected=null; deadCount=0;
   $('sidebar').innerHTML='<div class="sidebar-empty">enumerando…</div>';
   $('catalog').innerHTML='<div class="cat-empty">Selecciona un endpoint para ver su catálogo.</div>';
   $('findings').innerHTML='<div class="cat-empty">Aquí aparecerán los hallazgos validados.</div>';
@@ -452,9 +485,9 @@ function start(){
   $('log').innerHTML=''; logN=0; $('log_count').textContent=''; $('console').open=true;
   $('st_subs').textContent='0';
 
-  const p=new URLSearchParams({domain,depth:$('depth').value,tools:tools.join(','),demo:demo?'1':'0'});
+  const p=new URLSearchParams({domain,depth:$('depth').value,tools:tools.join(','),demo:demo?'1':'0',alive:alive?'1':'0'});
   setState('enumerando subdominios…',true);
-  log('info',`escaneo de ${domain} · ${demo?'demo':tools.join(', ')} · profundidad ${$('depth').value}`);
+  log('info',`escaneo de ${domain} · ${demo?'demo':tools.join(', ')} · profundidad ${$('depth').value}`+(alive?' · solo hosts que responden':''));
   $('go').textContent='■ Detener'; $('go').classList.add('scanning');
   // el dominio raíz también es un endpoint dorkeable
   addEndpoint(domain,0,'root');
@@ -469,14 +502,17 @@ function handleScan(ev){
     case 'tool_missing':log('warn',`fuente no disponible: ${ev.tool}`);break;
     case 'level_start':$('st_level').textContent=`${ev.level} · ${ev.targets}`;log('info',`— nivel ${ev.level} (${ev.targets} objetivos) —`);break;
     case 'tool_start':$('st_src').textContent=ev.tool;log('info',`▸ ${ev.tool} → ${ev.target}`);break;
-    case 'subdomain':addEndpoint(ev.host,ev.level,ev.source);log('sub',`  + ${ev.host} (${ev.source})`);break;
+    case 'subdomain':addEndpoint(ev.host,ev.level,ev.source,ev.status);
+      log('sub',`  + ${ev.host} (${ev.source})`+(ev.status?` · responde ${ev.status}`:''));break;
+    case 'subdomain_dead':deadCount++;$('st_dead').textContent=deadCount;$('st_dead').parentElement.style.display='';
+      log('warn',`  – ${ev.host} no responde (descartado)`);break;
     case 'tool_done':log(ev.new>0?'ok':'info',`✓ ${ev.tool}/${ev.target}: ${ev.found} enc., ${ev.new} nuevos`);break;
     case 'tool_error':log('err',`✗ ${ev.tool}/${ev.target||'-'}: ${ev.message}`);break;
     case 'level_done':log('info',`nivel ${ev.level} · ${ev.count} subdominios`);break;
-    case 'enum_done':setState(`enumeración lista · ${ev.count} subdominios`,false);
-      log('ok',`completo: ${ev.count} subdominios`);break;
+    case 'enum_done':setState(`enumeración lista · ${ev.count} subdominios`+(deadCount?` · ${deadCount} descartados`:''),false);
+      log('ok',`completo: ${ev.count} subdominios`+(deadCount?` (${deadCount} no respondían)`:''));break;
     case 'limit':log('warn','límite de hosts: '+ev.max_hosts);break;
-    case 'done':setState(`✓ listo · ${ev.subdomains} subdominios · elige uno y verifica`,false);
+    case 'done':setState(`✓ listo · ${ev.subdomains} subdominios`+(deadCount?` · ${deadCount} descartados`:'')+` · elige uno y verifica`,false);
       log('ok',`fin: ${ev.subdomains} subdominios`);stopES();break;
     case 'error':setState('error: '+ev.message,false);log('err',ev.message);stopES();break;
   }

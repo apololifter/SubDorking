@@ -113,6 +113,7 @@ async def _run_scan(request: Request, params: dict):
     depth = params["depth"]
     tools = params["tools"]
     demo = params["demo"]
+    alive = params.get("alive", False)
 
     async def worker():
         try:
@@ -123,7 +124,7 @@ async def _run_scan(request: Request, params: dict):
             if demo:
                 hosts = await _demo_enumerate(domain, depth, emit)
             else:
-                hosts = await enumerate_domain(domain, depth, tools, emit)
+                hosts = await enumerate_domain(domain, depth, tools, emit, alive_check=alive)
 
             # El dominio raíz también sirve como objetivo de dorks.
             targets = [domain] + [h for h in hosts if h != domain]
@@ -157,8 +158,9 @@ async def scan_stream(request: Request):
         depth = 1
     tools = [t for t in (q.get("tools", "crtsh,anubis,alienvault,hackertarget,subfinder").split(",")) if t]
     demo = q.get("demo", "0") in ("1", "true", "yes")
+    alive = q.get("alive", "0") in ("1", "true", "yes")
 
-    params = {"domain": domain, "depth": depth, "tools": tools, "demo": demo}
+    params = {"domain": domain, "depth": depth, "tools": tools, "demo": demo, "alive": alive}
     return StreamingResponse(
         _run_scan(request, params),
         media_type="text/event-stream",

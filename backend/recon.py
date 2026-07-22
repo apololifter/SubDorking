@@ -215,6 +215,26 @@ TIMEOUTS = {"crtsh": 40, "anubis": 25, "alienvault": 25, "hackertarget": 25,
             "subfinder": 90, "amass": 150}
 
 
+# --------------------------- liveness -------------------------------------
+
+async def _is_alive(host: str, timeout: int = 6) -> tuple[bool, int | None]:
+    """Comprueba si el host responde por HTTP (prueba https y luego http).
+
+    'Responde' = cualquier respuesta HTTP (incluye 4xx/5xx). Solo cuenta como
+    muerto si no hay respuesta (DNS/conexión/timeout). Acepta certificados
+    autofirmados (verify=False) porque es común en hosts internos.
+    """
+    for scheme in ("https://", "http://"):
+        try:
+            async with httpx.AsyncClient(timeout=timeout, headers=_UA,
+                                         follow_redirects=True, verify=False) as c:
+                r = await c.get(scheme + host)
+                return True, r.status_code
+        except Exception:  # noqa: BLE001
+            continue
+    return False, None
+
+
 # --------------------------- enumeración ----------------------------------
 
 async def enumerate_domain(
@@ -223,6 +243,7 @@ async def enumerate_domain(
     tools: list[str],
     on_event: EventCB,
     max_hosts: int = 5000,
+    alive_check: bool = False,
 ) -> list[str]:
     domain = domain.strip().lower().lstrip("*.")
 
@@ -238,13 +259,28 @@ async def enumerate_domain(
         return []
 
     discovered: set[str] = set()
+    emitted: set[str] = set()
     frontier: set[str] = {domain}
     queried: set[str] = set()
     next_frontier: set[str] = set()
+    pending_checks: list[asyncio.Task] = []
+    alive_sem = asyncio.Semaphore(20)
     limit_hit = False
 
+    async def _emit_subdomain(host, parent, level, source, status=None):
+        emitted.add(host)
+        ev = {"type": "subdomain", "host": host, "parent": parent,
+              "level": level, "source": source}
+        if status is not None:
+            ev["status"] = status
+        await on_event(ev)
+
     async def emit_host(host: str, parent: str, level: int, source: str):
-        """Registra un host (dedupe global) y lo transmite si es nuevo."""
+        """Registra un host (dedupe global) y lo transmite si es nuevo.
+
+        Con alive_check, el host se comprueba en paralelo y solo se emite a la
+        lista si responde por HTTP; los que no responden emiten 'subdomain_dead'.
+        """
         nonlocal limit_hit
         if not (host == domain or host.endswith("." + domain)):
             return
@@ -252,8 +288,17 @@ async def enumerate_domain(
             return
         discovered.add(host)
         next_frontier.add(host)
-        await on_event({"type": "subdomain", "host": host, "parent": parent,
-                        "level": level, "source": source})
+        if not alive_check:
+            await _emit_subdomain(host, parent, level, source)
+        else:
+            async def _check(h=host, p=parent, lv=level, src=source):
+                async with alive_sem:
+                    ok, code = await _is_alive(h)
+                if ok:
+                    await _emit_subdomain(h, p, lv, src, status=code)
+                else:
+                    await on_event({"type": "subdomain_dead", "host": h, "source": src})
+            pending_checks.append(asyncio.create_task(_check()))
         if len(discovered) >= max_hosts and not limit_hit:
             limit_hit = True
             await on_event({"type": "limit", "max_hosts": max_hosts})
@@ -295,10 +340,15 @@ async def enumerate_domain(
                 tasks.append(asyncio.create_task(run_one(tool, target, level)))
         if tasks:
             await asyncio.gather(*tasks)
+        # espera los chequeos de liveness lanzados en este nivel (si hay)
+        if pending_checks:
+            await asyncio.gather(*pending_checks)
+            pending_checks.clear()
 
-        await on_event({"type": "level_done", "level": level, "count": len(discovered)})
+        count = len(emitted) if alive_check else len(discovered)
+        await on_event({"type": "level_done", "level": level, "count": count})
         if limit_hit:
             break
         frontier = next_frontier
 
-    return sorted(discovered)
+    return sorted(emitted) if alive_check else sorted(discovered)
