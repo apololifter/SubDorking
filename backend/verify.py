@@ -77,13 +77,19 @@ async def _search_serper(client: httpx.AsyncClient, base: str, query: str) -> li
     Cada consulta consume 1 crédito. Resultados en organic[].link.
     """
     r = await client.post(_SERPER_URL, json={"q": query, "num": 10, "gl": "us", "hl": "en"})
-    if r.status_code in (401, 403):
-        raise RuntimeError(f"Serper: API key inválida o sin permiso (HTTP {r.status_code})")
-    if r.status_code == 402:
-        raise RuntimeError("Serper: sin créditos (402); recarga en tu panel o espera")
-    if r.status_code == 429:
-        raise RuntimeError("Serper: límite de tasa (429); baja la concurrencia o sube el delay")
-    r.raise_for_status()
+    if r.status_code >= 400:
+        try:
+            body = r.text[:200].replace("\n", " ").strip()
+        except Exception:  # noqa: BLE001
+            body = ""
+        if r.status_code in (401, 403):
+            raise RuntimeError(f"Serper: API key inválida o sin permiso (HTTP {r.status_code}) {body}")
+        if r.status_code == 402:
+            raise RuntimeError(f"Serper: sin créditos (402); recarga en tu panel. {body}")
+        if r.status_code == 429:
+            raise RuntimeError("Serper: límite de tasa (429); baja la concurrencia o sube el delay")
+        # 400 u otros: el cuerpo de Serper explica el motivo real
+        raise RuntimeError(f"Serper HTTP {r.status_code}: {body}")
     data = r.json()
     return [(x or {}).get("link") for x in (data.get("organic") or []) if (x or {}).get("link")]
 
