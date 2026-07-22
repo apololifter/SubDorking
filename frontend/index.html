@@ -642,10 +642,11 @@ $('vengine').addEventListener('change',()=>{
   $('cell-searxng').style.display=isSp?'none':'block';
   $('cell-serper').style.display=isSp?'block':'none';
   if(isSx&&!$('searxng').value) $('searxng').value='http://localhost:8888';
-  // Serper no bloquea: sin delay, más concurrencia y, si venías de scraping, sube a 1000
+  // Serper no bloquea: sin delay; concurrencia moderada (2) porque el free limita
+  // el ritmo — si aparece 429 el backend espera y reintenta solo. Si venías de scraping, sube a 1000
   if(isSp){ $('vdelay').value='0';
     if((parseInt($('vmax').value)||0)<50) $('vmax').value='1000';
-    if((parseInt($('vconc').value)||1)<3) $('vconc').value='5'; }
+    $('vconc').value='2'; }
   $('serperest').style.display=isSp?'block':'none';
   updateSerperEst();
   // nota de plan free: intext:/allintext: no están permitidos y se omiten solos

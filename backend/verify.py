@@ -84,7 +84,14 @@ async def _search_serper(client: httpx.AsyncClient, base: str, query: str) -> li
     La API key va en la cabecera X-API-KEY (se fija en el cliente; ver verify_host/ping).
     Cada consulta consume 1 crédito. Resultados en organic[].link.
     """
-    r = await client.post(_SERPER_URL, json={"q": query, "num": 10, "gl": "us", "hl": "en"})
+    # 429 = límite de tasa: no es fatal. Espera y reintenta con backoff creciente,
+    # de modo que la corrida se auto-regula al ritmo que permita el plan de Serper.
+    r = None
+    for attempt in range(6):
+        r = await client.post(_SERPER_URL, json={"q": query, "num": 10, "gl": "us", "hl": "en"})
+        if r.status_code != 429:
+            break
+        await asyncio.sleep(min(8.0, 1.5 * (attempt + 1)))
     if r.status_code >= 400:
         try:
             body = r.text[:200].replace("\n", " ").strip()
@@ -98,7 +105,7 @@ async def _search_serper(client: httpx.AsyncClient, base: str, query: str) -> li
         if r.status_code == 402:
             raise RuntimeError(f"Serper: sin créditos (402); recarga en tu panel. {body}")
         if r.status_code == 429:
-            raise RuntimeError("Serper: límite de tasa (429); baja la concurrencia o sube el delay")
+            raise RuntimeError("Serper: límite de tasa persistente (429) tras varios reintentos; baja la concurrencia")
         # otros 400/5xx: el cuerpo de Serper explica el motivo real
         raise RuntimeError(f"Serper HTTP {r.status_code}: {body}")
     data = r.json()
